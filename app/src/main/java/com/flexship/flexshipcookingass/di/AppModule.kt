@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.flexship.flexshipcookingass.db.CookDatabase
 import com.flexship.flexshipcookingass.other.Constans
+import com.flexship.flexshipcookingass.other.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +24,7 @@ object AppModule {
     ) = Room.databaseBuilder(
         context,
         CookDatabase::class.java,
-        Constans.DATABASE_NAME
+        DATABASE_NAME
     )
 
     @Provides

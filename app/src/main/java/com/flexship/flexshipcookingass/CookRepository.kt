@@ -4,7 +4,7 @@ import com.flexship.flexshipcookingass.db.CookDao
 import javax.inject.Inject
 
 class CookRepository @Inject constructor(
-    cookDao: CookDao
+    val cookDao : CookDao
 ) {
 
 }
