@@ -15,6 +15,8 @@
         <item name="chipStyle">@style/CustomChip</item>
         <item name="textInputStyle">@style/CustomInputStyle</item>
         <item name="materialAlertDialogTheme">@style/MaterialDialog</item>
+        <item name="cardViewStyle">@style/CardView.FlexShip</item>
+        <item name="imageButtonStyle">@style/ModernImageButton</item>
     </style>
 
     <style name="CustomInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
@@ -32,11 +34,39 @@
         <item name="boxCornerRadiusTopStart">0dp</item>
     </style>
 
+    <style name="CardView.FlexShip" parent="Widget.MaterialComponents.CardView">
+        <item name="cardElevation">4dp</item>
+        <item name="cardCornerRadius">10dp</item>
+    </style>
+
     <style name="MaterialDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/DialogShape</item>
         <item name="titleTextColor">@color/white</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveBStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/NegativeBStyle</item>
+    </style>
+
+    <style name="MaterialTextViewAccent" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/purple_wildberry</item>
+        <item name="fontFamily">sans-serif-light</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MaterialTextViewSemiAccent" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/blue_green</item>
+        <item name="fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="MaterialTextViewBlackHeader" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textColor">@color/black</item>
+        <item name="fontFamily">sans-serif-light</item>
+    </style>
+
+    <style name="TextButtonsFit" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:minHeight">2dp</item>
+        <item name="android:minWidth">2dp</item>
+        <item name="android:paddingStart">6dp</item>
+        <item name="android:paddingEnd">6dp</item>
     </style>
 
 
@@ -64,6 +94,13 @@
     <style name="roundedImageViewFull" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ModernImageButton">
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="tint">@color/blue_green</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:padding">4dp</item>
     </style>
 
 </resources>
