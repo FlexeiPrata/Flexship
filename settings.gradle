@@ -1,0 +1,2 @@
+rootProject.name = "Flexship Cooking Ass"
+include ':app'
