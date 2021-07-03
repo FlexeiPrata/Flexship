@@ -6,9 +6,9 @@
         <item name="colorPrimaryVariant">@color/purple_wildberry</item>
         <item name="colorOnPrimary">@color/gray_silver</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/purple_wildberry</item>
+        <item name="colorSecondary">@color/blue_green</item>
         <item name="colorSecondaryVariant">@color/blue_green</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/purple_wildberry</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <!-- Customize your theme here. -->
@@ -59,6 +59,11 @@
         <item name="android:textColor">@color/chip_text_color</item>
         <item name="checkedIconTint">@color/white</item>
         <item name="rippleColor">@color/purple_wildberry</item>
+    </style>
+
+    <style name="roundedImageViewFull" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
     </style>
 
 </resources>

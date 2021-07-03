@@ -7,4 +7,6 @@
     <string name="dish_choose_time">Указать время</string>
     <string name="dish_apply">Добавить</string>
     <string name="dish_final_apply">Добавить в меню</string>
+    <string name="dish_recipe">Ваш рецепт</string>
+    <string name="dish_add_photo">Добавить фото</string>
 </resources>
