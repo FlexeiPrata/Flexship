@@ -2,4 +2,9 @@
     <string name="app_name">Flexship Cooking Ass</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dish_title_hint">Название блюда</string>
+    <string name="stage_title_hint">Название этапа готовки</string>
+    <string name="dish_choose_time">Указать время</string>
+    <string name="dish_apply">Добавить</string>
+    <string name="dish_final_apply">Добавить в меню</string>
 </resources>
