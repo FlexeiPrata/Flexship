@@ -1,6 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/categoryFragment">
 
+    <fragment
+        android:id="@+id/categoryFragment"
+        android:name="com.flexship.flexshipcookingass.ui.fragments.CategoryFragment"
+        android:label="fragment_category"
+        tools:layout="@layout/fragment_category" >
+        <action
+            android:id="@+id/action_categoryFragment_to_recipeListFragment"
+            app:destination="@id/recipeListFragment"
+            app:enterAnim="@anim/scale_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/scale_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/cookingFragment"
+        android:name="com.flexship.flexshipcookingass.ui.fragments.CookingFragment"
+        android:label="fragment_cooking"
+        tools:layout="@layout/fragment_cooking" />
+    <fragment
+        android:id="@+id/dishFragment"
+        android:name="com.flexship.flexshipcookingass.ui.fragments.DishFragment"
+        android:label="fragment_dish"
+        tools:layout="@layout/fragment_dish" >
+        <action
+            android:id="@+id/action_dishFragment_to_cookingFragment"
+            app:destination="@id/cookingFragment"
+            app:enterAnim="@anim/scale_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/scale_out"/>
+    </fragment>
+    <fragment
+        android:id="@+id/recipeListFragment"
+        android:name="com.flexship.flexshipcookingass.ui.fragments.RecipeListFragment"
+        android:label="fragment_recipe_list"
+        tools:layout="@layout/fragment_recipe_list" >
+        <action
+            android:id="@+id/action_recipeListFragment_to_dishFragment"
+            app:destination="@id/dishFragment"
+            app:enterAnim="@anim/scale_in"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/scale_out"/>
+    </fragment>
 </navigation>

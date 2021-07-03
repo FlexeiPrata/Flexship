@@ -13,4 +13,59 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="CustomInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="startIconTint">@color/color_search_selector</item>
+        <item name="endIconTint">@color/color_search_selector</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="boxStrokeColor">@color/blue</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="hintTextColor">@color/grey</item>
+        <item name="boxBackgroundColor">@color/blue_alpha</item>
+        <item name="android:textColorHint">@color/grey</item>
+        <item name="strokeColor">@color/blue</item>
+        <item name="boxCornerRadiusBottomEnd">0dp</item>
+        <item name="boxCornerRadiusBottomStart">0dp</item>
+        <item name="boxCornerRadiusTopEnd">0dp</item>
+        <item name="boxCornerRadiusTopStart">0dp</item>
+    </style>
+
+    <style name="MaterialDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorPrimary">@color/blue_l</item>
+        <item name="colorSecondary">@color/blue_l</item>
+        <item name="colorSurface">@color/blue</item>
+        <item name="alertDialogStyle">@style/DialogShape</item>
+        <item name="titleTextColor">@color/white</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveBStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeBStyle</item>
+    </style>
+
+
+    <style name="DialogShape" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearance">@style/CustomShape</item>
+    </style>
+    <style name="CustomShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">10dp</item>
+    </style>
+    <style name="PositiveBStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/red</item>
+    </style>
+    <style name="NegativeBStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="CustomChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="chipBackgroundColor">@color/chip_color</item>
+        <item name="android:textColor">@color/chip_text</item>
+        <item name="checkedIconTint">@color/white</item>
+        <item name="rippleColor">@color/purple_200</item>
+    </style>
+    <style name="BottomSheetShape" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">30dp</item>
+        <item name="cornerSizeTopRight">30dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
 </resources>

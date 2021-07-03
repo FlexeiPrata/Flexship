@@ -33,5 +33,12 @@ object AppModule {
     ) = cookDatabase.provideCookDao()
 
 
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(
+        @ApplicationContext context: Context
+    ) = context.getSharedPreferences(Constans.SHARED_PREF_NAME,Context.MODE_PRIVATE)
+
+
 
 }
