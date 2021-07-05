@@ -10,5 +10,5 @@ import com.flexship.flexshipcookingass.models.Stages
 @TypeConverters(Converters::class)
 abstract class CookDatabase:RoomDatabase() {
 
-    abstract fun provideCookDao():CookDao
+    abstract fun provideCookDao() : CookDao
 }

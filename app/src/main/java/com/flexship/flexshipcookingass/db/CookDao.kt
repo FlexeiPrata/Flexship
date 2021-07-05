@@ -36,13 +36,13 @@ interface CookDao {
     //получаем лист стадий по ID
     @Transaction
     @Query("SELECT * FROM dish_table where id = :dishId")
-    fun getDishWithStages(dishId:Int):Flow<DishWithStages>
+    fun getDishWithStages(dishId:Int): Flow<DishWithStages>
 
     @Query("SELECT * FROM dish_table where category = :category")
-    fun getDishesByCategory(category:Int):Flow<List<Dish>>
+    fun getDishesByCategory(category:Int): Flow<List<Dish>>
 
     @Query("SELECT * FROM dish_table where category = :category ORDER BY name DESC")
-    fun getDishesByCategorySortedByName(category:Int):Flow<List<Dish>>
+    fun getDishesByCategorySortedByName(category:Int): Flow<List<Dish>>
 
 
 

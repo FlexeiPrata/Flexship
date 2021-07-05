@@ -8,20 +8,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class DialogFragmentToDelete: DialogFragment() {
 
-    private var actionToDelete:(()->Unit)?=null
+    private var actionToDelete : (()->Unit) ?= null
 
     fun setAction(action: (()->Unit)){
-        actionToDelete=action
+        actionToDelete = action
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return MaterialAlertDialogBuilder(requireContext())
             .setMessage("")
             .setTitle("")
-            .setPositiveButton(""){_,_->
+            .setPositiveButton(""){_ ,_ ->
                 actionToDelete?.invoke()
             }
-            .setNegativeButton(""){dial,_->
+            .setNegativeButton(""){dial, _ ->
                 dial.dismiss()
 
             }

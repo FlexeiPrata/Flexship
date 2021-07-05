@@ -36,12 +36,9 @@ import com.flexship.flexshipcookingass.other.Constans
 import com.flexship.flexshipcookingass.ui.dialogs.MinutePickerDialog
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import dagger.hilt.android.AndroidEntryPoint
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 
-@AndroidEntryPoint
 class DishFragment : Fragment(){
 
     private lateinit var stageAdapter: StageAdapter
@@ -59,8 +56,6 @@ class DishFragment : Fragment(){
     private var imageUri: Uri?=null
 
     private var minutes: Int?=null
-    private var dishId: Int= -1
-    private val stageList: MutableList<Stages> = mutableListOf()
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
             permissions->
@@ -142,19 +137,11 @@ class DishFragment : Fragment(){
         }
 
         if(args.dishId!=-1){
-            dishId=args.dishId
             viewModel.getDishById(args.dishId).observe(viewLifecycleOwner){
                     dishWithStages->
                 dish=dishWithStages.dish
                 stages=dishWithStages.stages
                 setValues()
-            }
-        }else{
-            val dish= Dish()
-            viewModel.insertDish(dish)
-
-            viewModel.getNewDish().observe(viewLifecycleOwner){
-                dishId=it
             }
         }
 
@@ -209,7 +196,7 @@ class DishFragment : Fragment(){
         }
 
         bAddStage.setOnClickListener {
-            checkFieldsForAddStage()
+            bTime.setText(R.string.dish_choose_time)
         }
 
         bInsertDish.setOnClickListener {
@@ -226,20 +213,6 @@ class DishFragment : Fragment(){
             }.show(parentFragmentManager,Constans.TAG_MINUTE_PICKER)
         }
 
-    }
-
-    private fun checkFieldsForAddStage() =with(binding){
-        val stageName= edStages.text.toString()
-        if(stageName.isNotEmpty() && minutes!=0 ){
-            val stage= Stages(name =stageName, time = minutes!! , dishId = dishId)
-            stageList.add(stage)
-            stageAdapter.differ.submitList(stageList)
-            bTime.setText(R.string.dish_choose_time)
-            minutes=0
-            edStages.setText("")
-        }else{
-            Snackbar.make(requireView(),"Введите название этапа и время приготовления",Snackbar.LENGTH_SHORT).show()
-        }
     }
 
 

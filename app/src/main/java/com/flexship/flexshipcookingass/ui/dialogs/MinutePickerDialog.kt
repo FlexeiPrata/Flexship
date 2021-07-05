@@ -15,10 +15,10 @@ const val MINUTES="MINUTES"
 class MinutePickerDialog: DialogFragment() {
 
     private var minutes: Int=0
-    private var actionPickMinutes: ((Int)->Unit)?=null
+    private var actionPickMinutes: ((Int)->Unit) ?= null
 
-    fun setAction(action:((Int)->Unit)){
-        actionPickMinutes=action
+    fun setAction(action : ((Int)->Unit)) {
+        actionPickMinutes = action
     }
 
     override fun onCreateView(
@@ -26,23 +26,23 @@ class MinutePickerDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view=inflater.inflate(R.layout.number_picker,container,false)
+        val view = inflater.inflate(R.layout.number_picker, container,false)
 
-        val binding= NumberPickerBinding.bind(view)
+        val binding = NumberPickerBinding.bind(view)
 
 
         binding.pickNumber.apply {
-            maxValue=200
-            minValue=0
-            wrapSelectorWheel=false
-            setOnValueChangedListener { picker, oldVal, newVal ->
-                minutes=newVal
+            maxValue = 200
+            minValue = 0
+            wrapSelectorWheel = false
+            setOnValueChangedListener { _, _, newVal ->
+                minutes = newVal
             }
         }
-        if(savedInstanceState!=null){
-            minutes=savedInstanceState.getInt(MINUTES)
-            binding.pickNumber.value=minutes
-        }
+
+        minutes = savedInstanceState?.getInt(MINUTES) ?: 0
+        binding.pickNumber.value = minutes
+
 
         binding.pickBSave.setOnClickListener {
             actionPickMinutes?.invoke(binding.pickNumber.value)
@@ -57,7 +57,7 @@ class MinutePickerDialog: DialogFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putInt(MINUTES,minutes)
+        outState.putInt(MINUTES, minutes)
     }
 
 

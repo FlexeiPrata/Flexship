@@ -22,7 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class DishListFragment : Fragment(),DishAdapter.onDishClick {
+class DishListFragment : Fragment(),DishAdapter.OnDishClick {
 
     private lateinit var binding:FragmentDishListBinding
 
