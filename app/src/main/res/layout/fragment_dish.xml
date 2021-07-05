@@ -110,17 +110,17 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/main_image"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_width="105dp"
+            android:layout_height="105dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
-            android:src="@drawable/empty"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="@+id/b_add_image"
-            app:shapeAppearanceOverlay="@style/roundedImageViewFull"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/textModalBoxTitle"
+            app:shapeAppearanceOverlay="@style/roundedImageViewFull"
+            app:srcCompat="@drawable/empty" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rec_view_stages"

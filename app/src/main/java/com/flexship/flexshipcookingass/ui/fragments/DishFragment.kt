@@ -88,7 +88,7 @@ class DishFragment : Fragment(){
     }
     private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         result->
-        if(result.resultCode==RESULT_OK){
+        if(result.resultCode == RESULT_OK){
             imageUri?.let {
                 binding.mainImage.setImageURI(it)
                 bitmap = convertUriToBitmap(it)
@@ -123,7 +123,7 @@ class DishFragment : Fragment(){
                 .findFragmentByTag(Constans.TAG_MINUTE_PICKER) as MinutePickerDialog?
 
             numberPickerDialog?.setAction { minutes ->
-                this.minutes=minutes
+                this.minutes = minutes
                 binding.bTime.text = minutes.toString().plus(" минут")
             }
         }
@@ -155,12 +155,12 @@ class DishFragment : Fragment(){
             }
         }
 
-        val textForSpinner= arrayOf("Супы","Закуски","Салаты","Пиццы","Горячее","Завтрак","Десерты")
-        val imagesForSpinner= arrayOf(R.drawable.soup,R.drawable.snack,R.drawable.salad,R.drawable.pizza,R.drawable.thanksgiving,R.drawable.breakfast,
+        val textForSpinner = arrayOf("Супы","Закуски","Салаты","Пиццы","Горячее","Завтрак","Десерты")
+        val imagesForSpinner = arrayOf(R.drawable.soup,R.drawable.snack,R.drawable.salad,R.drawable.pizza,R.drawable.thanksgiving,R.drawable.breakfast,
         R.drawable.vegan)
 
         binding.spinnerCategory.apply {
-            adapter=SpinnerAdapter(requireContext(),textForSpinner,imagesForSpinner)
+            adapter=SpinnerAdapter(requireContext(), textForSpinner, imagesForSpinner)
         }
 
     }
@@ -173,7 +173,7 @@ class DishFragment : Fragment(){
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setValues()=with(binding){
+    private fun setValues() = with(binding){
         dish?.let{
             dish->
             edName.setText(dish.name)
@@ -188,9 +188,9 @@ class DishFragment : Fragment(){
         }
     }
 
-    override fun onStart()= with(binding) {
+    override fun onStart() {
         super.onStart()
-
+        binding.apply {
         bAddImage.setOnClickListener {
             showPopupMenu()
         }
@@ -212,7 +212,7 @@ class DishFragment : Fragment(){
                 }
             }.show(parentFragmentManager,Constans.TAG_MINUTE_PICKER)
         }
-
+        }
     }
 
 
@@ -283,7 +283,7 @@ class DishFragment : Fragment(){
                     == PackageManager.PERMISSION_GRANTED
                     && ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED ->{
-                binding.bAddImage.isEnabled=true
+                binding.bAddImage.isEnabled = true
             }
             ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),android.Manifest.permission.CAMERA)
                     || ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),

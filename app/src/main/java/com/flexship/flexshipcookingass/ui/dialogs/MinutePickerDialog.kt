@@ -26,7 +26,7 @@ class MinutePickerDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view=inflater.inflate(R.layout.number_picker, container,false)
+        val view = inflater.inflate(R.layout.number_picker, container,false)
 
         val binding = NumberPickerBinding.bind(view)
 
