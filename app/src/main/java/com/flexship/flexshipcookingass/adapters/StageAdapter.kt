@@ -33,7 +33,7 @@ class StageAdapter(
         private val binding:StageAdapterBinding = StageAdapterBinding.bind(itemView)
 
         fun setData(stages: Stages)= with(binding){
-            stageTime.text=DateFormat.format("mm:ss",stages.time)
+            stageTime.text= stages.time.toString().plus(" мин")
             stageName.text=stages.name
         }
 

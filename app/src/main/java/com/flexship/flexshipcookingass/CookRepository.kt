@@ -29,4 +29,6 @@ class CookRepository @Inject constructor(
 
     fun getDishesByCategorySortedByName(category: Int) = cookDao.getDishesByCategorySortedByName(category)
 
+    fun getNewDish() = cookDao.getNewDish()
+
 }

@@ -29,4 +29,6 @@ class DishViewModel @Inject constructor(
     }
 
     fun getDishById(dishId :Int) = cookRepository.getDishWithStages(dishId).asLiveData()
+
+    fun getNewDish() = cookRepository.getNewDish().asLiveData()
 }
