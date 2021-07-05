@@ -13,7 +13,7 @@ import com.flexship.flexshipcookingass.models.Dish
 
 class DishAdapter(
     private val context: Context,
-    private val onDishClicked: onDishClick
+    private val onDishClicked: OnDishClick
 ) :RecyclerView.Adapter<DishAdapter.ViewHolderData>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderData {
@@ -30,10 +30,10 @@ class DishAdapter(
     }
 
     inner class ViewHolderData(itemView: View):RecyclerView.ViewHolder(itemView) {
-        private val binding=DishAdapterBinding.bind(itemView)
+        private val binding = DishAdapterBinding.bind(itemView)
 
-        fun setData(dish:Dish)= with(binding){
-            if(dish.image==null){
+        fun setData(dish:Dish) = with(binding){
+            if(dish.image == null){
                 dishImage.setImageResource(R.drawable.empty)
             }
             else{
@@ -65,19 +65,19 @@ class DishAdapter(
         }
 
     }
-    private val diffUtil=object :DiffUtil.ItemCallback<Dish>(){
+    private val diffUtil = object :DiffUtil.ItemCallback<Dish>(){
         override fun areItemsTheSame(oldItem: Dish, newItem: Dish): Boolean {
-            return oldItem.id==newItem.id
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Dish, newItem: Dish): Boolean {
-            return oldItem.hashCode()==newItem.hashCode()
+            return oldItem.hashCode() == newItem.hashCode()
         }
 
     }
     val differ=AsyncListDiffer(this,diffUtil)
 
-    interface onDishClick{
+    interface OnDishClick{
         fun onDishStarted(dish: Dish)
         fun onDishDeleted(dish: Dish)
         fun onDishEdited(dish: Dish)

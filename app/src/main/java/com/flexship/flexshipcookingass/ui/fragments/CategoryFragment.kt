@@ -20,9 +20,9 @@ class CategoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view= inflater.inflate(R.layout.fragment_category, container, false)
+        val view = inflater.inflate(R.layout.fragment_category, container, false)
 
-        binding= FragmentCategoryBinding.bind(view)
+        binding = FragmentCategoryBinding.bind(view)
 
         return view
     }

@@ -8,10 +8,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class DialogFragmentToDelete: DialogFragment() {
 
-    private var actionToDelete:(()->Unit)?=null
+    private var actionToDelete : (()->Unit) ?= null
 
     fun setAction(action: (()->Unit)){
-        actionToDelete=action
+        actionToDelete = action
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

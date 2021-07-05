@@ -23,13 +23,13 @@ class SpinnerAdapter(
         return getCustomView(position, parent)
     }
 
-    private fun getCustomView(position: Int,parent: ViewGroup):View{
-        val view=LayoutInflater.from(context).inflate(R.layout.spinner_item,parent,false)
+    private fun getCustomView(position: Int,parent: ViewGroup): View{
+        val view = LayoutInflater.from(context).inflate(R.layout.spinner_item,parent,false)
 
-        val binding=SpinnerItemBinding.bind(view)
+        val binding = SpinnerItemBinding.bind(view)
 
         binding.spinnerImage.setImageResource(images[position])
-        binding.spinnerText.text=text[position]
+        binding.spinnerText.text = text[position]
 
         return view
     }

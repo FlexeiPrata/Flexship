@@ -58,8 +58,8 @@ class DishFragment : Fragment(){
     private var minutes: Int?=null
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
-            permissions->
-        permissions.forEach { permission->
+            permissions ->
+        permissions.forEach { permission ->
             if(!permission.value){
                 if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),android.Manifest.permission.CAMERA)
                     || ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
@@ -75,14 +75,14 @@ class DishFragment : Fragment(){
                 return@registerForActivityResult
             }
         }
-        binding.bAddImage.isEnabled=true
+        binding.bAddImage.isEnabled = true
     }
     private val getPhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        result->
-        if(result.resultCode==RESULT_OK){
+        result ->
+        if(result.resultCode == RESULT_OK){
             result.data?.let {
                 binding.mainImage.setImageURI(it.data)
-                bitmap=convertUriToBitmap(it.data!!)
+                bitmap = convertUriToBitmap(it.data!!)
             }
         }
     }
@@ -91,7 +91,7 @@ class DishFragment : Fragment(){
         if(result.resultCode==RESULT_OK){
             imageUri?.let {
                 binding.mainImage.setImageURI(it)
-                bitmap=convertUriToBitmap(it)
+                bitmap = convertUriToBitmap(it)
             }
         }
     }
@@ -112,17 +112,17 @@ class DishFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(savedInstanceState!=null){
-            minutes=savedInstanceState.getInt(Constans.KEY_MINUTE)
-            binding.bTime.text = minutes.toString().plus(" минут")
-        }
 
-        if(savedInstanceState!= null){
+            minutes = savedInstanceState?.getInt(Constans.KEY_MINUTE) ?: 0
+            binding.bTime.text = minutes.toString().plus(" минут")
+
+
+        if(savedInstanceState != null){
 
             val numberPickerDialog= parentFragmentManager
                 .findFragmentByTag(Constans.TAG_MINUTE_PICKER) as MinutePickerDialog?
 
-            numberPickerDialog?.setAction { minutes->
+            numberPickerDialog?.setAction { minutes ->
                 this.minutes=minutes
                 binding.bTime.text = minutes.toString().plus(" минут")
             }
@@ -136,7 +136,7 @@ class DishFragment : Fragment(){
             adapter=stageAdapter
         }
 
-        if(args.dishId!=-1){
+        if (args.dishId != -1) {
             viewModel.getDishById(args.dishId).observe(viewLifecycleOwner){
                     dishWithStages->
                 dish=dishWithStages.dish
@@ -151,7 +151,7 @@ class DishFragment : Fragment(){
                 "Новое блюдо"
             }
             else{
-                "Блюдо:".plus(dish?.name)
+                "Блюдо: ".plus(dish?.name)
             }
         }
 
@@ -178,7 +178,7 @@ class DishFragment : Fragment(){
             dish->
             edName.setText(dish.name)
             edReceipt.setText(dish.recipe)
-            if(dish.image!=null)
+            if(dish.image != null)
                 mainImage.setImageBitmap(dish.image)
             else
                 mainImage.setImageResource(R.drawable.empty)
@@ -207,7 +207,7 @@ class DishFragment : Fragment(){
             MinutePickerDialog().apply {
                 setAction {
                     minutes->
-                    this@DishFragment.minutes=minutes
+                    this@DishFragment.minutes = minutes
                     bTime.text = minutes.toString().plus(" минут")
                 }
             }.show(parentFragmentManager,Constans.TAG_MINUTE_PICKER)
@@ -248,6 +248,7 @@ class DishFragment : Fragment(){
             MediaStore.Images.Media.getBitmap(requireContext().contentResolver,uri)
         }
     }
+
     private fun takePhoto(){
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.TITLE, "New Picture")
@@ -267,8 +268,8 @@ class DishFragment : Fragment(){
     }
     private fun getPhotoFromGallery(){
         Intent().apply {
-            action= Intent.ACTION_OPEN_DOCUMENT
-            type="image/*"
+            action = Intent.ACTION_OPEN_DOCUMENT
+            type = "image/*"
         }.also {
             getPhotoLauncher.launch(it)
         }
