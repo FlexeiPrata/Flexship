@@ -5,6 +5,10 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/categoryFragment">
 
+    <action
+        android:id="@+id/action_to_cookingFragment"
+        app:destination="@+id/cookingFragment"/>
+
     <fragment
         android:id="@+id/categoryFragment"
         android:name="com.flexship.flexshipcookingass.ui.fragments.CategoryFragment"
@@ -17,6 +21,9 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_right"
             app:popExitAnim="@anim/scale_out" />
+        <action
+            android:id="@+id/action_categoryFragment_to_dishFragment"
+            app:destination="@id/dishFragment" />
     </fragment>
     <fragment
         android:id="@+id/cookingFragment"
@@ -42,11 +49,11 @@
     </fragment>
     <fragment
         android:id="@+id/recipeListFragment"
-        android:name="com.flexship.flexshipcookingass.ui.fragments.RecipeListFragment"
+        android:name="com.flexship.flexshipcookingass.ui.fragments.DishListFragment"
         android:label="fragment_recipe_list"
-        tools:layout="@layout/fragment_recipe_list" >
+        tools:layout="@layout/fragment_dish_list" >
         <action
-            android:id="@+id/action_recipeListFragment_to_dishFragment"
+            android:id="@+id/action_dish_list_fragment_to_dish_fragment"
             app:destination="@id/dishFragment"
             app:enterAnim="@anim/scale_in"
             app:exitAnim="@anim/slide_out_left"

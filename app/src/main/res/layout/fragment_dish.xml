@@ -23,10 +23,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonFinalAdd2">
+            app:layout_constraintTop_toBottomOf="@+id/b_add_image">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textInputRecipe"
+                android:id="@+id/ed_receipt"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fontFamily="sans-serif-light"
@@ -44,11 +44,11 @@
             android:layout_marginEnd="8dp"
             android:hint="@string/dish_title_hint"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/imageView"
+            app:layout_constraintStart_toEndOf="@+id/main_image"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textInputTitle"
+                android:id="@+id/ed_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
@@ -60,14 +60,14 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/black_mild"
-            app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+            app:layout_constraintTop_toBottomOf="@+id/rec_view_stages" />
 
         <View
             android:id="@+id/viewDivider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/black_mild"
-            app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+            app:layout_constraintBottom_toTopOf="@+id/rec_view_stages"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -82,7 +82,7 @@
             app:layout_constraintTop_toBottomOf="@+id/spinnerCategory" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonFinalAdd"
+            android:id="@+id/b_insert_dish"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -96,19 +96,20 @@
             app:layout_constraintTop_toBottomOf="@+id/viewDivider" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonFinalAdd2"
+            android:id="@+id/b_add_image"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
+            android:enabled="false"
             android:text="@string/dish_add_photo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/textModalBoxTitle"
             app:layout_constraintTop_toBottomOf="@+id/textModalBoxTitle" />
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imageView"
+            android:id="@+id/main_image"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
@@ -116,20 +117,20 @@
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:src="@drawable/empty"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonFinalAdd2"
+            app:layout_constraintBottom_toBottomOf="@+id/b_add_image"
             app:shapeAppearanceOverlay="@style/roundedImageViewFull"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+            android:id="@+id/rec_view_stages"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonAdd"
+            app:layout_constraintTop_toBottomOf="@+id/b_add_stage"
             tools:itemCount="0" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -145,7 +146,7 @@
             app:layout_constraintTop_toBottomOf="@+id/viewDivider3">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textInputStageTitle"
+                android:id="@+id/ed_stages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
@@ -153,7 +154,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonTime"
+            android:id="@+id/b_time"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -166,7 +167,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textModalBoxStageTitle" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonAdd"
+            android:id="@+id/b_add_stage"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -176,7 +177,7 @@
             android:text="@string/dish_apply"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/buttonTime" />
+            app:layout_constraintTop_toBottomOf="@+id/b_time" />
 
         <Spinner
             android:id="@+id/spinnerCategory"

@@ -25,7 +25,7 @@ object AppModule {
         context,
         CookDatabase::class.java,
         DATABASE_NAME
-    )
+    ).build()
 
     @Provides
     @Singleton

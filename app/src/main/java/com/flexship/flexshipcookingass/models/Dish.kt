@@ -1,5 +1,6 @@
 package com.flexship.flexshipcookingass.models
 
+import android.graphics.Bitmap
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -10,5 +11,6 @@ data class Dish(
     val name : String,
     val recipe : String,
     val category: Int,
+    val image: Bitmap?=null,
     @ColumnInfo (name = "position_in_list") val positionInList: Int
 )

@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Stages(
     @PrimaryKey (autoGenerate = true) val id: Int,
     val name: String,
-    val time: Long
+    val time: Long,
+    val dishId:Int
 )

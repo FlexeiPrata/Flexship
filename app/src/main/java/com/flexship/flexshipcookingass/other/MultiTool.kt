@@ -15,7 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import kotlin.math.roundToInt
 
 const val DATABASE_NAME = "cook_database"
-const val DISH_ID_SAFE_ARG = "dish_id"
+const val DISH_ID_SAFE_ARG = "dishId"
 
 //анимация плавного сжатия View
 fun collapse(view: View) : Animation {

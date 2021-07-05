@@ -16,7 +16,7 @@
         app:srcCompat="@drawable/ra_point" />
 
     <TextView
-        android:id="@+id/textViewStageName"
+        android:id="@+id/stage_name"
         style="@style/MaterialTextViewBlackHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,12 +34,12 @@
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/textViewTime"
+        app:layout_constraintEnd_toStartOf="@+id/stage_time"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ra_time" />
 
     <TextView
-        android:id="@+id/textViewTime"
+        android:id="@+id/stage_time"
         style="@style/MaterialTextViewSemiAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
