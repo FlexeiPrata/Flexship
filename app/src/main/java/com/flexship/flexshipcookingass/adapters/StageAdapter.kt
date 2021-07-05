@@ -33,10 +33,9 @@ class StageAdapter(
         private val binding:StageAdapterBinding = StageAdapterBinding.bind(itemView)
 
         fun setData(stages: Stages)= with(binding){
-            stageTime.text=DateFormat.format("mm:ss",stages.time)
-            stageName.text=stages.name
+            stageTime.text = stages.time.toString().plus(" min")
+            stageName.text = stages.name
         }
-
     }
 
     private val diffUtil=object: DiffUtil.ItemCallback<Stages>() {

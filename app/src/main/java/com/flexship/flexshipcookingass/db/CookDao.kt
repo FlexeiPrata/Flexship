@@ -41,7 +41,7 @@ interface CookDao {
     @Query("SELECT * FROM dish_table where category = :category")
     fun getDishesByCategory(category:Int): Flow<List<Dish>>
 
-    @Query("SELECT * FROM dish_table where category = :category ORDER BY name DESC")
+    @Query("SELECT * FROM dish_table where category = :category ORDER BY name ASC")
     fun getDishesByCategorySortedByName(category:Int): Flow<List<Dish>>
 
 
