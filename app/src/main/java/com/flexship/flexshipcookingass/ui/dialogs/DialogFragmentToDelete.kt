@@ -18,10 +18,10 @@ class DialogFragmentToDelete: DialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setMessage("")
             .setTitle("")
-            .setPositiveButton(""){_,_->
+            .setPositiveButton(""){_ ,_ ->
                 actionToDelete?.invoke()
             }
-            .setNegativeButton(""){dial,_->
+            .setNegativeButton(""){dial, _ ->
                 dial.dismiss()
 
             }

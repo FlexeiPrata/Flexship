@@ -245,7 +245,7 @@ class DishFragment : Fragment(){
                 uri)
             ImageDecoder.decodeBitmap(source)
         } else{
-            MediaStore.Images.Media.getBitmap(requireContext().contentResolver,uri)
+            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
         }
     }
 
