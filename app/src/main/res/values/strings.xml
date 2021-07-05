@@ -11,4 +11,9 @@
     <string name="dish_add_photo">Добавить фото</string>
     <string name="start">Начать</string>
     <string name="edit">Редактировать</string>
+    <string name="seconds">Секунд</string>
+    <string name="minutes">Минут</string>
+    <string name="save">Сохранить</string>
+
+    <string name="timer">%s:%s</string>
 </resources>

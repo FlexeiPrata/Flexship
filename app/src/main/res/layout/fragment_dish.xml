@@ -91,11 +91,11 @@
             android:text="@string/dish_final_apply"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewDivider" />
+            app:layout_constraintTop_toBottomOf="@+id/viewDivider2" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/b_add_image"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/FlexOutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -153,7 +153,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/b_time"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/FlexOutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -166,7 +166,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/b_add_stage"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/FlexOutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -184,6 +184,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:foreground="@drawable/silver_frame"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.StageAdapterBinding
 import com.flexship.flexshipcookingass.models.Stages
+import com.flexship.flexshipcookingass.other.zeroOrNotZero
 
 class StageAdapter(
     private val context: Context
@@ -29,11 +30,16 @@ class StageAdapter(
         return differ.currentList.size
     }
 
-    class ViewHolderData(itemView: View) :RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolderData(itemView: View) :RecyclerView.ViewHolder(itemView) {
         private val binding: StageAdapterBinding = StageAdapterBinding.bind(itemView)
 
         fun setData(stages: Stages) = with(binding) {
-            stageTime.text = stages.time.toString().plus(" мин")
+            if (stages.time > 0) stageTime.text = String.format(context.getString(R.string.timer), zeroOrNotZero(stages.time / 60),
+                zeroOrNotZero( stages.time % 60))
+            else {
+                stageTime.visibility = View.GONE
+                imageView4.visibility = View.GONE
+            }
             stageName.text = stages.name
         }
     }

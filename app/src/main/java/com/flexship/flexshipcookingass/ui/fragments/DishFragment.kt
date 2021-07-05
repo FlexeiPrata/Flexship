@@ -1,7 +1,6 @@
 package com.flexship.flexshipcookingass.ui.fragments
 
 import android.app.Activity.RESULT_OK
-import android.app.TimePickerDialog
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,7 +16,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import android.widget.TimePicker
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,7 +23,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.adapters.SpinnerAdapter
 import com.flexship.flexshipcookingass.adapters.StageAdapter
@@ -33,13 +30,13 @@ import com.flexship.flexshipcookingass.databinding.FragmentDishBinding
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
 import com.flexship.flexshipcookingass.other.Constans
+import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import com.flexship.flexshipcookingass.ui.dialogs.MinutePickerDialog
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import pub.devrel.easypermissions.AppSettingsDialog
-import pub.devrel.easypermissions.EasyPermissions
 
 @AndroidEntryPoint
 class DishFragment : Fragment(){
@@ -52,14 +49,14 @@ class DishFragment : Fragment(){
     private val args:DishFragmentArgs by navArgs()
     private val viewModel:DishViewModel by viewModels()
 
-    private var dish: Dish?=null
-    private var stages: List<Stages>?=null
+    private lateinit var dish: Dish
+    private var stages = listOf<Stages>()
 
-    private var bitmap: Bitmap?=null
-    private var imageUri: Uri?=null
+    private var bitmap: Bitmap ?= null
+    private var imageUri: Uri ?= null
 
-    private var minutes: Int?=null
-    private var dishId: Int= -1
+    private var timeSec: Int = 0
+    private var dishId: Int = -1
     private val stageList: MutableList<Stages> = mutableListOf()
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
@@ -117,42 +114,36 @@ class DishFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(savedInstanceState!=null){
-            minutes=savedInstanceState.getInt(Constans.KEY_MINUTE)
-            binding.bTime.text = minutes.toString().plus(" минут")
-        }
+            timeSec = savedInstanceState?.getInt(Constans.KEY_MINUTE) ?: 0
+
 
         if(savedInstanceState!= null){
-
+            setTimeToButton(timeSec)
             val numberPickerDialog= parentFragmentManager
                 .findFragmentByTag(Constans.TAG_MINUTE_PICKER) as MinutePickerDialog?
 
-            numberPickerDialog?.setAction { minutes->
-                this.minutes=minutes
-                binding.bTime.text = minutes.toString().plus(" минут")
+            numberPickerDialog?.setAction { time->
+                this.timeSec = time
+                setTimeToButton(timeSec)
             }
         }
 
         checkPermissions()
+        stageAdapter = StageAdapter(requireContext())
+        updateListUI()
 
-        binding.recViewStages.apply {
-            layoutManager=LinearLayoutManager(context)
-            stageAdapter= StageAdapter(context)
-            adapter=stageAdapter
-        }
 
         if(args.dishId!=-1){
             dishId=args.dishId
             viewModel.getDishById(args.dishId).observe(viewLifecycleOwner){
                     dishWithStages->
-                dish=dishWithStages.dish
+                dish = dishWithStages.dish
                 stages=dishWithStages.stages
                 setValues()
             }
         }else{
-            val dish= Dish()
+            dish = Dish()
             viewModel.insertDish(dish)
-
             viewModel.getNewDish().observe(viewLifecycleOwner){
                 dishId=it
             }
@@ -160,22 +151,26 @@ class DishFragment : Fragment(){
 
         requireActivity().actionBar?.apply {
             setDisplayShowHomeEnabled(true)
-            title=if(dish==null){
+            title=if(dish.id <= 0){
                 "Новое блюдо"
             }
             else{
-                "Блюдо:".plus(dish?.name)
+                "Блюдо: ${dish.name}"
             }
         }
 
         val textForSpinner= arrayOf("Супы","Закуски","Салаты","Пиццы","Горячее","Завтрак","Десерты")
-        val imagesForSpinner= arrayOf(R.drawable.soup,R.drawable.snack,R.drawable.salad,R.drawable.pizza,R.drawable.thanksgiving,R.drawable.breakfast,
+        val imagesForSpinner= arrayOf(R.drawable.soup, R.drawable.snack, R.drawable.salad, R.drawable.pizza, R.drawable.thanksgiving, R.drawable.breakfast,
         R.drawable.vegan)
 
         binding.spinnerCategory.apply {
-            adapter=SpinnerAdapter(requireContext(),textForSpinner,imagesForSpinner)
+            adapter = SpinnerAdapter(requireContext(),textForSpinner,imagesForSpinner)
         }
 
+    }
+
+    private fun setTimeToButton(timeSec: Int) {
+        binding.bTime.text = String.format(getString(R.string.timer), zeroOrNotZero(timeSec / 60), zeroOrNotZero(timeSec % 60))
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -186,19 +181,14 @@ class DishFragment : Fragment(){
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setValues()=with(binding){
-        dish?.let{
-            dish->
+    private fun setValues() = with(binding){
             edName.setText(dish.name)
             edReceipt.setText(dish.recipe)
             if(dish.image!=null)
                 mainImage.setImageBitmap(dish.image)
             else
                 mainImage.setImageResource(R.drawable.empty)
-        }
-        stages?.let{
-            stageAdapter.differ.submitList(it)
-        }
+            stageAdapter.differ.submitList(stages)
     }
 
     override fun onStart()= with(binding) {
@@ -219,26 +209,37 @@ class DishFragment : Fragment(){
         bTime.setOnClickListener {
             MinutePickerDialog().apply {
                 setAction {
-                    minutes->
-                    this@DishFragment.minutes=minutes
-                    bTime.text = minutes.toString().plus(" минут")
+                    seconds ->
+                    timeSec = seconds
+                    setTimeToButton(timeSec)
                 }
             }.show(parentFragmentManager,Constans.TAG_MINUTE_PICKER)
         }
 
     }
 
-    private fun checkFieldsForAddStage() =with(binding){
-        val stageName= edStages.text.toString()
-        if(stageName.isNotEmpty() && minutes!=0 ){
-            val stage= Stages(name =stageName, time = minutes!! , dishId = dishId)
+    private fun checkFieldsForAddStage() {
+        binding.apply {
+        val stageName = edStages.text.toString()
+        if(stageName.isNotEmpty()){
+            val stage = Stages(name = stageName, time = timeSec, dishId = dishId)
             stageList.add(stage)
             stageAdapter.differ.submitList(stageList)
-            bTime.setText(R.string.dish_choose_time)
-            minutes=0
+            timeSec = 0
             edStages.setText("")
-        }else{
-            Snackbar.make(requireView(),"Введите название этапа и время приготовления",Snackbar.LENGTH_SHORT).show()
+            bTime.setText(R.string.dish_choose_time)
+            updateListUI()
+        }
+        else {
+            Snackbar.make(requireView(),"Введите название этапа", Snackbar.LENGTH_SHORT).show()
+        }
+        }
+    }
+
+    private fun updateListUI() {
+        binding.recViewStages.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = stageAdapter
         }
     }
 
@@ -345,9 +346,7 @@ class DishFragment : Fragment(){
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        minutes?.let {
-            outState.putInt(Constans.KEY_MINUTE,it)
-        }
+        outState.putInt(Constans.KEY_MINUTE, timeSec)
     }
 
 

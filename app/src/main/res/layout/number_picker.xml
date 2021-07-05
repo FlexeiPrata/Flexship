@@ -6,51 +6,76 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textViewSecondsText"
+        style="@style/MaterialTextViewSemiAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="32dp"
-        android:text="Укажите длительность готовки данного этапа."
-        android:textColor="?attr/colorPrimary"
-        android:textSize="14sp"
-        app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="4dp"
+        android:text="@string/seconds"
+        app:layout_constraintEnd_toEndOf="@+id/pickSeconds"
+        app:layout_constraintStart_toStartOf="@+id/pickSeconds"
+        app:layout_constraintTop_toBottomOf="@+id/pickSeconds" />
 
     <NumberPicker
-        android:id="@+id/pick_number"
+        android:id="@+id/pickSeconds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="@+id/textView"
-        app:layout_constraintHorizontal_bias="0.532"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-    <Button
-        android:id="@+id/pick_b_save"
+    <NumberPicker
+        android:id="@+id/pickMinutes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Сохранить"
-        app:layout_constraintEnd_toEndOf="@+id/pick_number"
-        app:layout_constraintStart_toStartOf="@+id/pick_number"
-        app:layout_constraintTop_toBottomOf="@+id/pick_number" />
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/pick_b_save"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/save"
+        app:layout_constraintEnd_toEndOf="@+id/pickSeconds"
+        app:layout_constraintStart_toStartOf="@+id/pickMinutes"
+        app:layout_constraintTop_toBottomOf="@+id/textViewMinutesText" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        android:tooltipText="@string/dish_choose_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/dish_choose_time" />
 
     <TextView
-        android:id="@+id/pick_dismiss"
+        android:id="@+id/textViewMinutesText"
+        style="@style/MaterialTextViewSemiAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Отмена"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@+id/pick_b_save"
-        app:layout_constraintStart_toStartOf="@+id/pick_b_save"
-        app:layout_constraintTop_toBottomOf="@+id/pick_b_save" />
+        android:layout_marginTop="4dp"
+        android:text="@string/minutes"
+        app:layout_constraintEnd_toEndOf="@+id/pickMinutes"
+        app:layout_constraintStart_toStartOf="@+id/pickMinutes"
+        app:layout_constraintTop_toBottomOf="@+id/pickMinutes" />
+
+    <Space
+        android:layout_width="4dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
+        app:layout_constraintEnd_toStartOf="@+id/pickSeconds"
+        app:layout_constraintStart_toEndOf="@+id/pickMinutes"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

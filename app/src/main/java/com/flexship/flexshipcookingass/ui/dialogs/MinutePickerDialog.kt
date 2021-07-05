@@ -1,21 +1,21 @@
 package com.flexship.flexshipcookingass.ui.dialogs
 
-import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.NumberPickerBinding
-import kotlin.math.min
+import com.flexship.flexshipcookingass.other.MINUTES
 
-const val MINUTES="MINUTES"
+
 class MinutePickerDialog: DialogFragment() {
 
-    private var minutes: Int=0
+    private var timeSec: Int = 0
+    private var timeMin: Int = 0
     private var actionPickMinutes: ((Int)->Unit) ?= null
+    private lateinit var binding: NumberPickerBinding
 
     fun setAction(action : ((Int)->Unit)) {
         actionPickMinutes = action
@@ -28,36 +28,39 @@ class MinutePickerDialog: DialogFragment() {
     ): View? {
         val view = inflater.inflate(R.layout.number_picker, container,false)
 
-        val binding = NumberPickerBinding.bind(view)
+        binding = NumberPickerBinding.bind(view)
 
 
-        binding.pickNumber.apply {
-            maxValue = 200
+        binding.pickMinutes.apply {
+            maxValue = 180
             minValue = 0
-            wrapSelectorWheel = false
-            setOnValueChangedListener { _, _, newVal ->
-                minutes = newVal
-            }
+            wrapSelectorWheel = true
         }
 
-        minutes = savedInstanceState?.getInt(MINUTES) ?: 0
-        binding.pickNumber.value = minutes
+        binding.pickSeconds.apply {
+            maxValue = 59
+            minValue = 0
+            wrapSelectorWheel = true
+        }
+
+        timeSec = savedInstanceState?.getInt(MINUTES) ?: 0
+        binding.pickSeconds.value = timeSec % 60
+        binding.pickMinutes.value = timeMin / 60
 
 
         binding.pickBSave.setOnClickListener {
-            actionPickMinutes?.invoke(binding.pickNumber.value)
+            timeSec = binding.pickSeconds.value + (binding.pickMinutes.value * 60)
+            actionPickMinutes?.invoke(timeSec)
             dismiss()
         }
-        binding.pickDismiss.setOnClickListener {
-            dismiss()
-        }
+
         return view
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-
-        outState.putInt(MINUTES, minutes)
+        timeSec = binding.pickSeconds.value + (binding.pickMinutes.value * 60)
+        outState.putInt(MINUTES, timeSec)
     }
 
 

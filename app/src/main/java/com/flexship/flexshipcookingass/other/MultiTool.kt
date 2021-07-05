@@ -16,6 +16,7 @@ import kotlin.math.roundToInt
 
 const val DATABASE_NAME = "cook_database"
 const val DISH_ID_SAFE_ARG = "dishId"
+const val MINUTES = "MINUTES"
 
 //анимация плавного сжатия View
 fun collapse(view: View) : Animation {
@@ -71,4 +72,9 @@ fun drawableToBitmap(drawable: Drawable): Bitmap? {
 //конвертация dp в пиксели
 fun convertDpToPx(context: Context, dp: Int): Int {
     return (dp * (context.resources.displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
+}
+
+fun zeroOrNotZero(i : Int) : String{
+    if (i>9) return i.toString()
+    else return "0$i"
 }
