@@ -17,7 +17,7 @@ class StageAdapter(
 ) :RecyclerView.Adapter<StageAdapter.ViewHolderData>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderData {
-        val view=LayoutInflater.from(context).inflate(R.layout.stage_adapter,parent,false)
+        val view = LayoutInflater.from(context).inflate(R.layout.stage_adapter, parent,false)
         return ViewHolderData(view)
     }
 
@@ -30,23 +30,23 @@ class StageAdapter(
     }
 
     class ViewHolderData(itemView: View) :RecyclerView.ViewHolder(itemView) {
-        private val binding:StageAdapterBinding = StageAdapterBinding.bind(itemView)
+        private val binding: StageAdapterBinding = StageAdapterBinding.bind(itemView)
 
-        fun setData(stages: Stages)= with(binding){
-            stageTime.text = stages.time.toString().plus(" min")
+        fun setData(stages: Stages) = with(binding) {
+            stageTime.text = stages.time.toString().plus(" мин")
             stageName.text = stages.name
         }
     }
 
-    private val diffUtil=object: DiffUtil.ItemCallback<Stages>() {
+    private val diffUtil = object: DiffUtil.ItemCallback<Stages>() {
         override fun areItemsTheSame(oldItem: Stages, newItem: Stages): Boolean {
-            return oldItem.id==newItem.id
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Stages, newItem: Stages): Boolean {
-            return  oldItem.hashCode()==newItem.hashCode()
+            return  oldItem.hashCode() == newItem.hashCode()
         }
     }
-    val differ=AsyncListDiffer(this,diffUtil)
+    val differ = AsyncListDiffer(this, diffUtil)
 
 }
