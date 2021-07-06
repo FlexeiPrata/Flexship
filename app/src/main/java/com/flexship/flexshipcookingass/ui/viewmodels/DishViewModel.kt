@@ -27,12 +27,23 @@ class DishViewModel @Inject constructor(
     fun insertStage(stage: Stages) = viewModelScope.launch(Dispatchers.IO){
         cookRepository.insertStage(stage)
     }
+    fun updateStages(stages: List<Stages>) = viewModelScope.launch(Dispatchers.IO){
+        cookRepository.updateStages(stages)
+    }
 
     fun getDishById(dishId :Int) = cookRepository.getDishWithStages(dishId).asLiveData()
 
     fun getNewDish() = cookRepository.getNewDish().asLiveData()
 
-    fun updateDish(dish: Dish) = viewModelScope.launch(Dispatchers.IO){
+    fun updateDish(dish: Dish,stages: List<Stages> = listOf(),updateStage:Boolean=false) = viewModelScope.launch(Dispatchers.IO){
         cookRepository.updateDish(dish)
+        if(stages.isNotEmpty()){
+            if(updateStage){
+                updateStages(stages)
+            }
+            else{
+                insertStages(stages)
+            }
+        }
     }
 }

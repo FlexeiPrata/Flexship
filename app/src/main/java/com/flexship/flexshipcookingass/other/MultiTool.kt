@@ -19,7 +19,7 @@ const val DISH_ID_SAFE_ARG = "dishId"
 const val MINUTES = "MINUTES"
 
 //анимация плавного сжатия View
-fun collapse(view: View) : Animation {
+fun collapse(view: View): Animation {
     val actualHeight = view.measuredHeight
     val animation: Animation = object : Animation() {
         override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
@@ -62,7 +62,11 @@ fun drawableToBitmap(drawable: Drawable): Bitmap? {
         return drawable.bitmap
     }
     val bitmap =
-        Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+        Bitmap.createBitmap(
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight,
+            Bitmap.Config.ARGB_8888
+        )
     val canvas = Canvas(bitmap)
     drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
     drawable.draw(canvas)
@@ -74,7 +78,20 @@ fun convertDpToPx(context: Context, dp: Int): Int {
     return (dp * (context.resources.displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
 }
 
-fun zeroOrNotZero(i : Int) : String{
-    if (i>9) return i.toString()
+fun zeroOrNotZero(i: Int): String {
+    if (i > 9) return i.toString()
     else return "0$i"
+}
+
+fun getTitleCategory(id: Int): String {
+    return when (id) {
+        0 -> "Супы"
+        1 -> "Закуски"
+        2 -> "Салаты"
+        3 -> "Пиццы"
+        4 -> "Горячее"
+        5 -> "Завтрак"
+        6 -> "Десерты"
+        else -> "CUM"
+    }
 }

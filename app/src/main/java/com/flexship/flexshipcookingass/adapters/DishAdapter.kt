@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.DishAdapterBinding
 import com.flexship.flexshipcookingass.models.Dish
+import com.flexship.flexshipcookingass.other.getTitleCategory
 
 class DishAdapter(
     private val context: Context,
@@ -41,16 +42,7 @@ class DishAdapter(
             }
 
             dishName.text=dish.name
-            dishCategory.text=when(dish.category){
-                0-> "Супы"
-                1-> "Закуски"
-                2-> "Салаты"
-                3-> "Пиццы"
-                4-> "Горячее"
-                5-> "Завтрак"
-                6-> "Десерты"
-                else-> "CUM"
-            }
+            dishCategory.text= getTitleCategory(dish.category)
 
             dishBDelete.setOnClickListener {
                 onDishClicked.onDishDeleted(dish)

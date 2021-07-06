@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -59,6 +60,9 @@ class DishFragment : Fragment() {
     private var timeSec: Int = 0
     private var dishId: Int = -1
     private var stageList: MutableList<Stages> = mutableListOf()
+    private var bufStageList: MutableList<Stages> = mutableListOf()
+
+    private var isNewDish: Boolean = true
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -143,12 +147,16 @@ class DishFragment : Fragment() {
 
 
         if (args.dishId != -1) {
+            isNewDish = false
             dishId = args.dishId
             viewModel.getDishById(args.dishId).observe(viewLifecycleOwner) { dishWithStages ->
                 dish = dishWithStages.dish
                 stageList = dishWithStages.stages.toMutableList()
+                bufStageList = dishWithStages.stages.toMutableList()
                 setValues()
+                setTitle("Блюдо:".plus(dish.name))
             }
+            binding.bInsertDish.text = "Обновить"
         } else {
             dish = Dish()
             viewModel.insertDish(dish)
@@ -158,16 +166,15 @@ class DishFragment : Fragment() {
         }
 
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-            setDisplayShowHomeEnabled(true)
-            title = if (dish.id <= 0) {
-                "Новое блюдо"
-            } else {
-                "Блюдо: ${dish.name}"
-            }
-        }
-
     }
+
+    private fun setTitle(titleT: String) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            title = titleT
+        }
+    }
+
 
     private fun setTimeToButton(timeSec: Int) {
         binding.bTime.text = String.format(
@@ -186,6 +193,7 @@ class DishFragment : Fragment() {
     }
 
     private fun setValues() = with(binding) {
+        bitmap = dish.image
         edName.setText(dish.name)
         edReceipt.setText(dish.recipe)
         if (dish.image != null)
@@ -193,6 +201,7 @@ class DishFragment : Fragment() {
         else
             mainImage.setImageResource(R.drawable.empty)
         stageAdapter.differ.submitList(stageList.toList())
+        spinnerCategory.setSelection(dish.category)
     }
 
     override fun onStart() = with(binding) {
@@ -207,7 +216,7 @@ class DishFragment : Fragment() {
         }
 
         bInsertDish.setOnClickListener {
-            checkFieldsToAddNewDish()
+            checkFieldsToAddNewDishOrUpdate()
         }
 
         bTime.setOnClickListener {
@@ -252,14 +261,13 @@ class DishFragment : Fragment() {
                 timeSec = 0
                 edStages.setText("")
                 bTime.setText(R.string.dish_choose_time)
-                //updateListUI()
             } else {
                 Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun checkFieldsToAddNewDish() = with(binding) {
+    private fun checkFieldsToAddNewDishOrUpdate() = with(binding) {
         val name = edName.text.toString()
         val desc = edReceipt.text.toString()
         if (name.isEmpty() && desc.isEmpty())
@@ -289,18 +297,38 @@ class DishFragment : Fragment() {
         val spinnerPos = spinnerCategory.selectedItemPosition
         val dish = Dish(dishId, name, desc, spinnerPos, bitmap)
 
-        viewModel.updateDish(dish)
+        if (isNewDish) {
+            viewModel.updateDish(dish, stageList)
+        } else {
+            insertNewStagesBeforeUpdate()
+            viewModel.updateDish(dish, stageList, true)
+        }
+        findNavController().navigate(R.id.action_dishFragment_to_categoryFragment)
+
     }
+
+    private fun insertNewStagesBeforeUpdate() {
+        var tr = false
+        if (stageList != bufStageList) {
+            for (stage in stageList) {
+                for (buf in bufStageList) {
+                    if (stage.id == buf.id)
+                        tr = true
+                }
+                if (!tr) {
+                    viewModel.insertStage(stage)
+                }
+                tr = false
+            }
+        }
+    }
+
     private fun showMinutePickerDialog() = MinutePickerDialog().apply {
         setAction { seconds ->
             timeSec = seconds
             setTimeToButton(timeSec)
         }
     }.show(parentFragmentManager, Constans.TAG_MINUTE_PICKER)
-
-
-
-
 
 
     //ЭТО не ТРОГАТЬ

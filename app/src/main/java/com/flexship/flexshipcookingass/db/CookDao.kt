@@ -24,6 +24,9 @@ interface CookDao {
     @Delete
     suspend fun deleteDish(dish: Dish)
 
+    @Query("SELECT * FROM dish_table")
+    fun getDishes(): Flow<List<Dish>>
+
     @Query("DELETE FROM stages_table where dishId = :dishId")
     suspend fun deleteStages(dishId: Int)
 

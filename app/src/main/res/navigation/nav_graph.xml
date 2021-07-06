@@ -51,6 +51,9 @@
             android:name="dishId"
             app:argType="integer"
             android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_dishFragment_to_categoryFragment"
+            app:destination="@id/categoryFragment" />
     </fragment>
     <fragment
         android:id="@+id/recipeListFragment"
@@ -68,5 +71,8 @@
             android:name="categoryId"
             app:argType="integer"
             android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_recipeListFragment_to_cookingFragment"
+            app:destination="@id/cookingFragment" />
     </fragment>
 </navigation>
