@@ -1,5 +1,6 @@
 package com.flexship.flexshipcookingass.di
 
+import android.app.PendingIntent
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -39,6 +40,7 @@ object AppModule {
     fun provideSharedPreferences(
         @ApplicationContext context: Context
     ) = context.getSharedPreferences(Constans.SHARED_PREF_NAME,Context.MODE_PRIVATE)
+
 
 
 

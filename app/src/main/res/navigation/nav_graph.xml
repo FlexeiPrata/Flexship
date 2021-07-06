@@ -29,7 +29,12 @@
         android:id="@+id/cookingFragment"
         android:name="com.flexship.flexshipcookingass.ui.fragments.CookingFragment"
         android:label="fragment_cooking"
-        tools:layout="@layout/fragment_cooking" />
+        tools:layout="@layout/fragment_cooking" >
+        <argument
+            android:name="dishId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
     <fragment
         android:id="@+id/dishFragment"
         android:name="com.flexship.flexshipcookingass.ui.fragments.DishFragment"

@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -17,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -39,66 +41,73 @@ import dagger.hilt.android.AndroidEntryPoint
 import pub.devrel.easypermissions.AppSettingsDialog
 
 @AndroidEntryPoint
-class DishFragment : Fragment(){
+class DishFragment : Fragment() {
 
     private lateinit var stageAdapter: StageAdapter
 
     private lateinit var _binding: FragmentDishBinding
     private val binding get() = _binding
 
-    private val args:DishFragmentArgs by navArgs()
-    private val viewModel:DishViewModel by viewModels()
+    private val args: DishFragmentArgs by navArgs()
+    private val viewModel: DishViewModel by viewModels()
 
     private lateinit var dish: Dish
-    private var stages = listOf<Stages>()
 
-    private var bitmap: Bitmap ?= null
-    private var imageUri: Uri ?= null
+    private var bitmap: Bitmap? = null
+    private var imageUri: Uri? = null
 
     private var timeSec: Int = 0
     private var dishId: Int = -1
-    private val stageList: MutableList<Stages> = mutableListOf()
+    private var stageList: MutableList<Stages> = mutableListOf()
 
-    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
-            permissions->
-        permissions.forEach { permission->
-            if(!permission.value){
-                if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),android.Manifest.permission.CAMERA)
-                    || ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    || ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-                    alertDialog("Handling permissions"
-                        ,"Please accept all the permissions to be able to set an image of your dish...")
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.forEach { permission ->
+                if (!permission.value) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(
+                            requireActivity(),
+                            android.Manifest.permission.CAMERA
+                        )
+                        || ActivityCompat.shouldShowRequestPermissionRationale(
+                            requireActivity(),
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE
+                        )
+                        || ActivityCompat.shouldShowRequestPermissionRationale(
+                            requireActivity(),
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        )
+                    ) {
+                        alertDialog(
+                            "Handling permissions",
+                            "Please accept all the permissions to be able to set an image of your dish...",
+                            false
+                        )
+                    } else {
+                        AppSettingsDialog.Builder(this).build().show()
+                    }
+                    return@registerForActivityResult
                 }
-                else{
-                    AppSettingsDialog.Builder(this).build().show()
+            }
+            binding.bAddImage.isEnabled = true
+        }
+    private val getPhotoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                result.data?.let {
+                    binding.mainImage.setImageURI(it.data)
+                    bitmap = convertUriToBitmap(it.data!!)
                 }
-                return@registerForActivityResult
             }
         }
-        binding.bAddImage.isEnabled=true
-    }
-    private val getPhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        result->
-        if(result.resultCode==RESULT_OK){
-            result.data?.let {
-                binding.mainImage.setImageURI(it.data)
-                bitmap=convertUriToBitmap(it.data!!)
+    private val takePhotoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                imageUri?.let {
+                    binding.mainImage.setImageURI(it)
+                    bitmap = convertUriToBitmap(it)
+                }
             }
         }
-    }
-    private val takePhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        result->
-        if(result.resultCode==RESULT_OK){
-            imageUri?.let {
-                binding.mainImage.setImageURI(it)
-                bitmap=convertUriToBitmap(it)
-            }
-        }
-    }
-
-
 
 
     override fun onCreateView(
@@ -114,84 +123,79 @@ class DishFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-            timeSec = savedInstanceState?.getInt(Constans.KEY_MINUTE) ?: 0
+        timeSec = savedInstanceState?.getInt(Constans.KEY_MINUTE) ?: 0
 
 
-        if(savedInstanceState!= null){
+        if (savedInstanceState != null) {
             setTimeToButton(timeSec)
-            val numberPickerDialog= parentFragmentManager
+            val numberPickerDialog = parentFragmentManager
                 .findFragmentByTag(Constans.TAG_MINUTE_PICKER) as MinutePickerDialog?
 
-            numberPickerDialog?.setAction { time->
+            numberPickerDialog?.setAction { time ->
                 this.timeSec = time
                 setTimeToButton(timeSec)
             }
         }
 
         checkPermissions()
-        stageAdapter = StageAdapter(requireContext())
-        updateListUI()
+
+        setupUI()
 
 
-        if(args.dishId!=-1){
-            dishId=args.dishId
-            viewModel.getDishById(args.dishId).observe(viewLifecycleOwner){
-                    dishWithStages->
+        if (args.dishId != -1) {
+            dishId = args.dishId
+            viewModel.getDishById(args.dishId).observe(viewLifecycleOwner) { dishWithStages ->
                 dish = dishWithStages.dish
-                stages=dishWithStages.stages
+                stageList = dishWithStages.stages.toMutableList()
                 setValues()
             }
-        }else{
+        } else {
             dish = Dish()
             viewModel.insertDish(dish)
-            viewModel.getNewDish().observe(viewLifecycleOwner){
-                dishId=it
+            viewModel.getNewDish().observe(viewLifecycleOwner) {
+                dishId = it
             }
         }
 
-        requireActivity().actionBar?.apply {
+
+        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
             setDisplayShowHomeEnabled(true)
-            title=if(dish.id <= 0){
+            title = if (dish.id <= 0) {
                 "Новое блюдо"
-            }
-            else{
+            } else {
                 "Блюдо: ${dish.name}"
             }
-        }
-
-        val textForSpinner= arrayOf("Супы","Закуски","Салаты","Пиццы","Горячее","Завтрак","Десерты")
-        val imagesForSpinner= arrayOf(R.drawable.soup, R.drawable.snack, R.drawable.salad, R.drawable.pizza, R.drawable.thanksgiving, R.drawable.breakfast,
-        R.drawable.vegan)
-
-        binding.spinnerCategory.apply {
-            adapter = SpinnerAdapter(requireContext(),textForSpinner,imagesForSpinner)
         }
 
     }
 
     private fun setTimeToButton(timeSec: Int) {
-        binding.bTime.text = String.format(getString(R.string.timer), zeroOrNotZero(timeSec / 60), zeroOrNotZero(timeSec % 60))
+        binding.bTime.text = String.format(
+            getString(R.string.timer),
+            zeroOrNotZero(timeSec / 60),
+            zeroOrNotZero(timeSec % 60)
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId==android.R.id.home){
+        if (item.itemId == android.R.id.home) {
             findNavController().popBackStack()
             return true
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setValues() = with(binding){
-            edName.setText(dish.name)
-            edReceipt.setText(dish.recipe)
-            if(dish.image!=null)
-                mainImage.setImageBitmap(dish.image)
-            else
-                mainImage.setImageResource(R.drawable.empty)
-            stageAdapter.differ.submitList(stages)
+    private fun setValues() = with(binding) {
+        edName.setText(dish.name)
+        edReceipt.setText(dish.recipe)
+        if (dish.image != null)
+            mainImage.setImageBitmap(dish.image)
+        else
+            mainImage.setImageResource(R.drawable.empty)
+        stageAdapter.differ.submitList(stageList.toList())
     }
 
-    override fun onStart()= with(binding) {
+    override fun onStart() = with(binding) {
         super.onStart()
 
         bAddImage.setOnClickListener {
@@ -203,57 +207,112 @@ class DishFragment : Fragment(){
         }
 
         bInsertDish.setOnClickListener {
-
+            checkFieldsToAddNewDish()
         }
 
         bTime.setOnClickListener {
-            MinutePickerDialog().apply {
-                setAction {
-                    seconds ->
-                    timeSec = seconds
-                    setTimeToButton(timeSec)
-                }
-            }.show(parentFragmentManager,Constans.TAG_MINUTE_PICKER)
+            showMinutePickerDialog()
         }
 
+    }
+
+    private fun setupUI() {
+
+        binding.recViewStages.apply {
+            layoutManager = LinearLayoutManager(context)
+            stageAdapter = StageAdapter(context)
+            adapter = stageAdapter
+        }
+
+
+        val textForSpinner =
+            arrayOf("Супы", "Закуски", "Салаты", "Пиццы", "Горячее", "Завтрак", "Десерты")
+        val imagesForSpinner = arrayOf(
+            R.drawable.soup,
+            R.drawable.snack,
+            R.drawable.salad,
+            R.drawable.pizza,
+            R.drawable.thanksgiving,
+            R.drawable.breakfast,
+            R.drawable.vegan
+        )
+
+        binding.spinnerCategory.apply {
+            adapter = SpinnerAdapter(requireContext(), textForSpinner, imagesForSpinner)
+        }
     }
 
     private fun checkFieldsForAddStage() {
         binding.apply {
-        val stageName = edStages.text.toString()
-        if(stageName.isNotEmpty()){
-            val stage = Stages(name = stageName, time = timeSec, dishId = dishId)
-            stageList.add(stage)
-            stageAdapter.differ.submitList(stageList)
-            timeSec = 0
-            edStages.setText("")
-            bTime.setText(R.string.dish_choose_time)
-            updateListUI()
+            val stageName = edStages.text.toString()
+            if (stageName.isNotEmpty()) {
+                val stage = Stages(name = stageName, time = timeSec, dishId = dishId)
+                stageList.add(stage)
+                stageAdapter.differ.submitList(stageList.toList())
+                timeSec = 0
+                edStages.setText("")
+                bTime.setText(R.string.dish_choose_time)
+                //updateListUI()
+            } else {
+                Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    private fun checkFieldsToAddNewDish() = with(binding) {
+        val name = edName.text.toString()
+        val desc = edReceipt.text.toString()
+        if (name.isEmpty() && desc.isEmpty())
+            Snackbar.make(requireView(), "Введите имя и рецепт блюда", Snackbar.LENGTH_SHORT).show()
+        else if (bitmap == null)
+            alertDialog(
+                "Изображение блюда",
+                "Вы не выбрали изображение для блюда.Вы действительно хотите продолжить без изображения блюда?",
+                true
+            )
+        else if (stageList.size == 0)
+            alertDialog(
+                "Этапы готовки",
+                "У вас отсутствуют этапы готовки.Вы действительно хотите продолжить без этапов готовки?",
+                true
+            )
+        else if (name.isEmpty())
+            Snackbar.make(requireView(), "Введите имя  блюда", Snackbar.LENGTH_SHORT).show()
+        else if (desc.isEmpty())
+            Snackbar.make(requireView(), "Введите рецепт блюда", Snackbar.LENGTH_SHORT).show()
         else {
-            Snackbar.make(requireView(),"Введите название этапа", Snackbar.LENGTH_SHORT).show()
-        }
-        }
-    }
-
-    private fun updateListUI() {
-        binding.recViewStages.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = stageAdapter
+            updateDish(name, desc)
         }
     }
 
+    private fun updateDish(name: String, desc: String) = with(binding) {
+        val spinnerPos = spinnerCategory.selectedItemPosition
+        val dish = Dish(dishId, name, desc, spinnerPos, bitmap)
 
-    private fun showPopupMenu(){
-        PopupMenu(requireContext(),binding.bAddImage).apply {
+        viewModel.updateDish(dish)
+    }
+    private fun showMinutePickerDialog() = MinutePickerDialog().apply {
+        setAction { seconds ->
+            timeSec = seconds
+            setTimeToButton(timeSec)
+        }
+    }.show(parentFragmentManager, Constans.TAG_MINUTE_PICKER)
+
+
+
+
+
+
+    //ЭТО не ТРОГАТЬ
+    private fun showPopupMenu() {
+        PopupMenu(requireContext(), binding.bAddImage).apply {
             inflate(R.menu.photo_menu)
-            setOnMenuItemClickListener {
-                item->
-                if(item.itemId==R.id.get_photo){
+            setOnMenuItemClickListener { item ->
+                if (item.itemId == R.id.get_photo) {
                     getPhotoFromGallery()
                     return@setOnMenuItemClickListener false
                 }
-                if(item.itemId==R.id.take_photo){
+                if (item.itemId == R.id.take_photo) {
                     takePhoto()
                     return@setOnMenuItemClickListener false
                 }
@@ -268,15 +327,18 @@ class DishFragment : Fragment(){
     }
 
     private fun convertUriToBitmap(uri: Uri): Bitmap {
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-            val source= ImageDecoder.createSource(requireContext().contentResolver,
-                uri)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val source = ImageDecoder.createSource(
+                requireContext().contentResolver,
+                uri
+            )
             ImageDecoder.decodeBitmap(source)
-        } else{
-            MediaStore.Images.Media.getBitmap(requireContext().contentResolver,uri)
+        } else {
+            MediaStore.Images.Media.getBitmap(requireContext().contentResolver, uri)
         }
     }
-    private fun takePhoto(){
+
+    private fun takePhoto() {
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.TITLE, "New Picture")
             put(MediaStore.Images.Media.DESCRIPTION, "From camera")
@@ -293,53 +355,83 @@ class DishFragment : Fragment(){
         }
 
     }
-    private fun getPhotoFromGallery(){
+
+    private fun getPhotoFromGallery() {
         Intent().apply {
-            action= Intent.ACTION_OPEN_DOCUMENT
-            type="image/*"
+            action = Intent.ACTION_OPEN_DOCUMENT
+            type = "image/*"
         }.also {
             getPhotoLauncher.launch(it)
         }
     }
 
     //PERMISSIONS
-    private fun checkPermissions(){
-        when{
-            ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.CAMERA)== PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    private fun checkPermissions() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
                     == PackageManager.PERMISSION_GRANTED
-                    && ContextCompat.checkSelfPermission(requireContext(),android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED ->{
-                binding.bAddImage.isEnabled=true
+                    && ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+                    == PackageManager.PERMISSION_GRANTED -> {
+                binding.bAddImage.isEnabled = true
             }
-            ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),android.Manifest.permission.CAMERA)
-                    || ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    || ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)->{
-                alertDialog("Handling permissions"
-                    ,"Please accept all the permissions to be able to set an image of your dish...")
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                android.Manifest.permission.CAMERA
+            )
+                    || ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+                    || ActivityCompat.shouldShowRequestPermissionRationale(
+                requireActivity(),
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) -> {
+                alertDialog(
+                    "Handling permissions",
+                    "Please accept all the permissions to be able to set an image of your dish...",
+                    false
+                )
             }
-            else->{
+            else -> {
                 requestPermissions()
             }
         }
     }
 
-    private fun requestPermissions(){
-        permissionLauncher.launch(arrayOf(android.Manifest.permission.CAMERA,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
+    private fun requestPermissions() {
+        permissionLauncher.launch(
+            arrayOf(
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        )
     }
 
-    private fun alertDialog(title: String, message: String) {
+    private fun alertDialog(title: String, message: String, isImage: Boolean) {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton("Ok"){_,_->
-                requestPermissions()
+            .setPositiveButton("Да") { _, _ ->
+                if (!isImage) {
+                    requestPermissions()
+                } else {
+                    val name = binding.edName.text.toString()
+                    val desc = binding.edReceipt.text.toString()
+                    updateDish(name, desc)
+                }
             }
-            .setNegativeButton("No",null)
+            .setNegativeButton("Нет", null)
             .create()
             .show()
     }
@@ -348,7 +440,6 @@ class DishFragment : Fragment(){
         super.onSaveInstanceState(outState)
         outState.putInt(Constans.KEY_MINUTE, timeSec)
     }
-
 
 
 }

@@ -31,4 +31,8 @@ class DishViewModel @Inject constructor(
     fun getDishById(dishId :Int) = cookRepository.getDishWithStages(dishId).asLiveData()
 
     fun getNewDish() = cookRepository.getNewDish().asLiveData()
+
+    fun updateDish(dish: Dish) = viewModelScope.launch(Dispatchers.IO){
+        cookRepository.updateDish(dish)
+    }
 }

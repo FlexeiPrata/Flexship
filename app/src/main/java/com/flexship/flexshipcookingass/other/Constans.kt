@@ -6,9 +6,23 @@ object Constans {
     const val SHARED_PREF_NAME="PREFS"
     const val TAG_DIALOG_DELETE="TAG_DIALOG_DELETE"
     const val TAG_MINUTE_PICKER="TAG_MINUTE_PICKER"
-    const val PERMISSION_REQ=1
 
     const val KEY_MINUTE="KEY_MINUTE"
+
+    //SERVICE
+    const val ACTION_START_RESUME="ACTION_START_RESUME"
+    const val ACTION_PAUSE="ACTION_PAUSE"
+    const val ACTION_STOP="ACTION_STOP"
+    const val KEY_DISH_ID="KEY_DISH_ID"
+
+    const val ACTION_PENDING_INTENT="ACTION_PENDING_INTENT"
+
+    //NOTIFICATION
+    const val NOTIFICATION_CHANNEL_ID="cooking_channel"
+    const val NOTIFICATION_CHANNEL_NAME="Cooking"
+    const val NOTIFICATION_ID=1
+
+
 
 
 }
