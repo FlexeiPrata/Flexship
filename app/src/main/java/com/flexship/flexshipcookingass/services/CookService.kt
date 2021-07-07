@@ -47,7 +47,7 @@ class CookService : LifecycleService() {
                 ACTION_START_RESUME -> {
                     if (isFirstCooking) {
                         startForegroundService()
-                        timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
+                        timeToCook = it.getIntExtra(Constans.KEY_TIME, 0).toLong()
                     } else {
                         runTimer()
                     }
@@ -127,11 +127,11 @@ class CookService : LifecycleService() {
 
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
+                if (timeToCook == totalTime) {
+                    //stop timer
+                }
                 loopTime = System.currentTimeMillis() - timeStarted
                 timer.postValue(loopTime + totalTime)
-                if (timeToCook == totalTime+loopTime) {
-                    pauseService()
-                }
 
                 delay(Constans.DELAY_FOR_TIMER)
             }
@@ -167,14 +167,6 @@ class CookService : LifecycleService() {
         )
 
         notificationManager.createNotificationChannel(channel)
-    }
-    private fun cancelService(){
-        isCanceled=true
-        isFirstCooking=true
-        pauseService()
-        postInitialValues()
-        stopForeground(true)
-        stopSelf()
     }
 
 //    private fun getFormattedTime(time:Int):String{
