@@ -127,8 +127,7 @@ class CookService : LifecycleService() {
         timeStarted = System.currentTimeMillis()
 
         CoroutineScope(Dispatchers.Main).launch {
-            while (isCooking.valu
-                e!!) {
+            while (isCooking.value!!) {
                 if (timeToCook == totalTime) {
                     //stop timer
                 }
