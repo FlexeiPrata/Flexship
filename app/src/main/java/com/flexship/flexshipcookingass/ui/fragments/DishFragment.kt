@@ -160,6 +160,7 @@ class DishFragment : Fragment() {
         } else {
             dish = Dish()
             viewModel.insertDish(dish)
+            setTitle("Новое блюдо")
             viewModel.getNewDish().observe(viewLifecycleOwner) {
                 dishId = it
             }
