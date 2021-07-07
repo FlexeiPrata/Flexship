@@ -33,9 +33,6 @@ class CookService : LifecycleService() {
     private var timeToCook = 0L
 
     //timer
-    private var timeStarted = 0L
-    private var loopTime = 0L
-    private var totalTime = 0L
     private var isTimerEnabled = false
 
     @Inject
@@ -47,10 +44,8 @@ class CookService : LifecycleService() {
         intent?.let {
             when (it.action) {
                 ACTION_START_RESUME -> {
-                    Log.d("MyLog","HUI4")
                     if (isFirstCooking) {
-                        Log.d("MyLog","HUI")
-                        timeToCook = it.getIntExtra(Constans.KEY_TIME, 0).toLong()
+                        timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
                         startForegroundService()
                     } else {
                         runTimer()
@@ -60,7 +55,7 @@ class CookService : LifecycleService() {
                     pauseService()
                 }
                 ACTION_STOP -> {
-
+                    cancelService()
                 }
             }
         }
@@ -123,25 +118,21 @@ class CookService : LifecycleService() {
 
     private fun postInitialValues() {
         isCooking.postValue(false)
-        timer.postValue(0)
+        //timer.postValue(0)
     }
 
     private fun runTimer() {
         isCooking.postValue(true)
         isTimerEnabled = true
-        timeStarted = System.currentTimeMillis()
 
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
-                if (timeToCook == totalTime) {
-                    //stop timer
-                }
-                loopTime = System.currentTimeMillis() - timeStarted
-                timer.postValue(loopTime + totalTime)
-
+                timeToCook-=1000L
+                timer.postValue(timeToCook)
+                if(timeToCook==0L)
+                    pauseService()
                 delay(Constans.DELAY_FOR_TIMER)
             }
-            totalTime += loopTime
         }
     }
 
@@ -181,7 +172,12 @@ class CookService : LifecycleService() {
         notificationManager.createNotificationChannel(channel)
     }
 
-//    private fun getFormattedTime(time:Int):String{
-//        //time
-//    }
+
+    private fun cancelService(){
+        isCooking.postValue(false)
+        isTimerEnabled=false
+        isCanceled=true
+        stopForeground(true)
+        stopSelf()
+    }
 }

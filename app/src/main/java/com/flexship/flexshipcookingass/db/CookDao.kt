@@ -19,7 +19,7 @@ interface CookDao {
     suspend fun insertStage(stages: Stages)
 
     @Query("SELECT MAX(id) from dish_table")
-    fun getNewDish(): Flow<Int>
+    fun getNewDish(): Flow<Int?>
 
     @Delete
     suspend fun deleteDish(dish: Dish)

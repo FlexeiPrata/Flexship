@@ -72,4 +72,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Этап завершён!"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/textViewTimer"
+        app:layout_constraintStart_toStartOf="@+id/textViewTimer"
+        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

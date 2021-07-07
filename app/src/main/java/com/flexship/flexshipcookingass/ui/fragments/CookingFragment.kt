@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -76,7 +77,7 @@ class CookingFragment : Fragment() {
 
             stageAdapter.differ.submitList(stageList)
 
-            currentStage=stageAdapter.differ.currentList[currentPos]
+            followToNewStage()
         }
         subscribeToObservers()
 
@@ -85,6 +86,9 @@ class CookingFragment : Fragment() {
     private fun subscribeToObservers(){
         CookService.timer.observe(viewLifecycleOwner){
             time->
+            if(time==0L){
+                binding.textView2.isVisible=true
+            }
             binding.textViewTimer.text="${zeroOrNotZero(time / 1000 / 60)}:${zeroOrNotZero(time / 1000 % 60)}"
 
         }
@@ -109,9 +113,9 @@ class CookingFragment : Fragment() {
         binding.fabNext.setOnClickListener {
             isNewStage=true
             sendCommandToService(Constans.ACTION_STOP)
+            followToNewStage()
         }
         binding.fabPauseOrResume.setOnClickListener {
-            Log.d("MyLog","HUI3")
             if(isCooking){
                 sendCommandToService(Constans.ACTION_PAUSE)
             }else{
@@ -122,12 +126,17 @@ class CookingFragment : Fragment() {
             sendCommandToService(Constans.ACTION_STOP)
         }
     }
+
+    private fun followToNewStage() {
+        currentStage=stageAdapter.differ.currentList[currentPos++]
+        binding.textViewName.text="Текущий этап-".plus(currentStage?.name)
+    }
+
     private fun sendCommandToService(actionToDo:String){
         Intent(requireContext(),CookService::class.java).apply {
-            Log.d("MyLog","HUI2")
             action=actionToDo
             if(isNewStage){
-                putExtra(Constans.KEY_TIME,currentStage?.time)
+                putExtra(Constans.KEY_TIME,currentStage!!.time*1000L)
                 isNewStage=false
             }
         }.also {
