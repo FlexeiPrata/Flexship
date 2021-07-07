@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -18,6 +19,7 @@ import com.flexship.flexshipcookingass.other.Constans.ACTION_STOP
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_ID
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_NAME
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_ID
+import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -45,9 +47,11 @@ class CookService : LifecycleService() {
         intent?.let {
             when (it.action) {
                 ACTION_START_RESUME -> {
+                    Log.d("MyLog","HUI4")
                     if (isFirstCooking) {
-                        startForegroundService()
+                        Log.d("MyLog","HUI")
                         timeToCook = it.getIntExtra(Constans.KEY_TIME, 0).toLong()
+                        startForegroundService()
                     } else {
                         runTimer()
                     }
@@ -70,6 +74,8 @@ class CookService : LifecycleService() {
 
     override fun onCreate() {
         super.onCreate()
+
+        currentNotificationBuilder=notificationBuilder
 
         postInitialValues()
 
@@ -141,6 +147,8 @@ class CookService : LifecycleService() {
 
     private fun startForegroundService() {
 
+        isFirstCooking=false
+
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -152,9 +160,13 @@ class CookService : LifecycleService() {
 
         startForeground(NOTIFICATION_ID, notificationBuilder.build())
 
-        timer.observe(this){
-            time->
-            val notification=currentNotificationBuilder.setContentText()
+        timer.observe(this) { time ->
+            val notification = currentNotificationBuilder.setContentText(
+                "${zeroOrNotZero(time / 1000 / 60)}:${
+                    zeroOrNotZero(time / 1000 % 60)
+                }"
+            )
+            notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
     }
 

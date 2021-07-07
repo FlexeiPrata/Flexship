@@ -82,10 +82,6 @@ fun zeroOrNotZero(i: Int): String {
     if (i > 9) return i.toString()
     else return "0$i"
 }
-fun zeroOrNotZero(i: Long): String {
-    if (i > 9) return i.toString()
-    else return "0$i"
-}
 
 fun zeroOrNotZero(i: Long): String {
     if (i > 9) return i.toString()

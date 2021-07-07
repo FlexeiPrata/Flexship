@@ -256,7 +256,7 @@ class DishFragment : Fragment() {
         binding.apply {
             val stageName = edStages.text.toString()
             if (stageName.isNotEmpty()) {
-                val stage = Stages(name = stageName, time = timeSec, dishId = dishId)
+                val stage = Stages(name = stageName, time = timeSec.toLong(), dishId = dishId)
                 stageList.add(stage)
                 stageAdapter.differ.submitList(stageList.toList())
                 timeSec = 0

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.flexship.flexshipcookingass.MainActivity
+import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.other.Constans
 import dagger.Module
 import dagger.Provides
@@ -47,6 +48,7 @@ object ServiceModule {
     ) = NotificationCompat.Builder(context,Constans.NOTIFICATION_CHANNEL_ID)
         .setAutoCancel(true)
         .setOngoing(true)
+        .setSmallIcon(R.drawable.breakfast)
         .setContentTitle("Currently cooking")
         .setContentText("00:00")
         .setContentIntent(pendingIntent)
