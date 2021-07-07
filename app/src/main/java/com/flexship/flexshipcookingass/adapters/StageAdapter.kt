@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.StageAdapterBinding
+import com.flexship.flexshipcookingass.helpers.DragAndDropSwappable
 import com.flexship.flexshipcookingass.models.Stages
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 
@@ -30,7 +31,7 @@ class StageAdapter(
         return differ.currentList.size
     }
 
-    inner class ViewHolderData(itemView: View) :RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolderData(itemView: View) :RecyclerView.ViewHolder(itemView), DragAndDropSwappable.ItemDragDropMoveViewHolder {
         private val binding: StageAdapterBinding = StageAdapterBinding.bind(itemView)
 
         fun setData(stages: Stages) = with(binding) {
@@ -41,6 +42,22 @@ class StageAdapter(
                 imageView4.visibility = View.GONE
             }
             stageName.text = stages.name
+        }
+
+        override fun onItemSelected() {
+
+        }
+
+        override fun onItemClear() {
+
+        }
+
+        override fun onItemDelete() {
+
+        }
+
+        override fun onItemEdit() {
+            notifyItemChanged(adapterPosition)
         }
     }
 

@@ -47,6 +47,8 @@ interface CookDao {
     @Query("SELECT * FROM dish_table where category = :category ORDER BY name ASC")
     fun getDishesByCategorySortedByName(category:Int): Flow<List<Dish>>
 
+    @Delete
+    suspend fun deleteStage(stage: Stages)
 
 
 

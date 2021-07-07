@@ -25,14 +25,17 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.adapters.SpinnerAdapter
 import com.flexship.flexshipcookingass.adapters.StageAdapter
 import com.flexship.flexshipcookingass.databinding.FragmentDishBinding
+import com.flexship.flexshipcookingass.helpers.DragAndDropSwappable
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
 import com.flexship.flexshipcookingass.other.Constans
+import com.flexship.flexshipcookingass.other.collapse
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import com.flexship.flexshipcookingass.ui.dialogs.MinutePickerDialog
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
@@ -159,11 +162,12 @@ class DishFragment : Fragment() {
             binding.bInsertDish.text = "Обновить"
         } else {
             dish = Dish()
-            viewModel.insertDish(dish)
+            //viewModel.insertDish(dish)
             setTitle("Новое блюдо")
             viewModel.getNewDish().observe(viewLifecycleOwner) {
+                dishId = 1
                 it?.let {
-                    dishId=it
+                    dishId = it + 1
                 }
             }
         }
@@ -234,6 +238,28 @@ class DishFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             stageAdapter = StageAdapter(context)
             adapter = stageAdapter
+
+        }.also {
+            val itemListner = ItemTouchHelper(object : DragAndDropSwappable(requireContext()) {
+                override fun swapList(startPosition: Int, targetPosition: Int) {
+
+                }
+
+                override fun saveInDatabase() {
+
+                }
+
+                override fun itemDelete(pos: Int) {
+                    val stage = stageAdapter.differ.currentList[pos]
+                    if (stage.isSaved == 1) viewModel.deleteStage(stage)
+                    else {
+                        stageList.removeAt(pos)
+                        stageAdapter.differ.submitList(stageList.toList())
+                    }
+                }
+
+            })
+            itemListner.attachToRecyclerView(it)
         }
 
 
@@ -301,7 +327,12 @@ class DishFragment : Fragment() {
         val dish = Dish(dishId, name, desc, spinnerPos, bitmap)
 
         if (isNewDish) {
-            viewModel.updateDish(dish, stageList)
+            viewModel.insertDish(dish)
+
+            for (i in stageList)
+                i.isSaved = 1
+
+            viewModel.insertStages(stageList)
         } else {
             insertNewStagesBeforeUpdate()
             viewModel.updateDish(dish, stageList, true)
@@ -319,6 +350,7 @@ class DishFragment : Fragment() {
                         tr = true
                 }
                 if (!tr) {
+                    stage.isSaved = 1
                     viewModel.insertStage(stage)
                 }
                 tr = false

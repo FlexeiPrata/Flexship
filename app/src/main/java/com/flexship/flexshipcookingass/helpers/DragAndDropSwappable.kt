@@ -117,6 +117,7 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         if (direction == ItemTouchHelper.RIGHT) {
             if (viewHolder is ItemDragDropMoveViewHolder) viewHolder.onItemDelete()
+            itemDelete(viewHolder.adapterPosition)
         }
         if (direction == ItemTouchHelper.LEFT) {
             if (viewHolder is ItemDragDropMoveViewHolder) viewHolder.onItemEdit()
@@ -124,6 +125,7 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
 
     }
 
+    abstract fun itemDelete(pos: Int)
 
 
 }
