@@ -24,6 +24,7 @@ import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import com.flexship.flexshipcookingass.services.CookService
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Exception
 
 @AndroidEntryPoint
 class CookingFragment : Fragment() {
@@ -84,6 +85,7 @@ class CookingFragment : Fragment() {
     }
 
     private fun subscribeToObservers(){
+        Log.d("Zalupa", "OnObserve")
         CookService.timer.observe(viewLifecycleOwner){
             time->
             if(time==0L){
@@ -93,6 +95,7 @@ class CookingFragment : Fragment() {
 
         }
         CookService.isCooking.observe(viewLifecycleOwner){
+            Log.d("Zalupa", "HUI + $it")
             updateToggle(it)
         }
     }
@@ -111,10 +114,11 @@ class CookingFragment : Fragment() {
         super.onStart()
 
         binding.fabNext.setOnClickListener {
-            isNewStage=true
             sendCommandToService(Constans.ACTION_STOP)
             followToNewStage()
+            isNewStage=true
         }
+
         binding.fabPauseOrResume.setOnClickListener {
             if(isCooking){
                 sendCommandToService(Constans.ACTION_PAUSE)
@@ -124,18 +128,27 @@ class CookingFragment : Fragment() {
         }
         binding.fabStop.setOnClickListener {
             sendCommandToService(Constans.ACTION_STOP)
+            findNavController().popBackStack()
         }
     }
 
     private fun followToNewStage() {
-        currentStage=stageAdapter.differ.currentList[currentPos++]
-        binding.textViewName.text="Текущий этап-".plus(currentStage?.name)
+        try {
+            currentStage=stageAdapter.differ.currentList[currentPos++]
+        }
+        catch (ex: Exception){
+            ex.printStackTrace()
+        }
+        binding.textViewName.text="Текущий этап - ".plus(currentStage?.name)
+        binding.textView2.isVisible = false
+        binding.textViewTimer.text = ""
     }
 
     private fun sendCommandToService(actionToDo:String){
         Intent(requireContext(),CookService::class.java).apply {
             action=actionToDo
             if(isNewStage){
+                Log.d("Zalupa", "Huinea rabotai ${currentStage!!.time * 1000L}")
                 putExtra(Constans.KEY_TIME,currentStage!!.time*1000L)
                 isNewStage=false
             }

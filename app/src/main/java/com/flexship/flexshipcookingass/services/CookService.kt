@@ -46,6 +46,7 @@ class CookService : LifecycleService() {
                 ACTION_START_RESUME -> {
                     if (isFirstCooking) {
                         timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
+                        Log.d("Zalupa", "Vremea $timeToCook")
                         startForegroundService()
                     } else {
                         runTimer()
@@ -124,7 +125,7 @@ class CookService : LifecycleService() {
     private fun runTimer() {
         isCooking.postValue(true)
         isTimerEnabled = true
-
+        Log.d("Zalupa", "OnRun")
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
                 timeToCook-=1000L
@@ -153,9 +154,7 @@ class CookService : LifecycleService() {
 
         timer.observe(this) { time ->
             val notification = currentNotificationBuilder.setContentText(
-                "${zeroOrNotZero(time / 1000 / 60)}:${
-                    zeroOrNotZero(time / 1000 % 60)
-                }"
+                "${zeroOrNotZero(time / 1000 / 60)}:${zeroOrNotZero(time / 1000 % 60)}"
             )
             notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
@@ -174,10 +173,17 @@ class CookService : LifecycleService() {
 
 
     private fun cancelService(){
-        isCooking.postValue(false)
-        isTimerEnabled=false
+        Log.d("Zalupa", "OnCancel")
+        //pauseService()
         isCanceled=true
+        postInitialValues()
         stopForeground(true)
         stopSelf()
+    }
+
+    override fun onDestroy() {
+        Log.d("Zalupa", "OnDestroy")
+        super.onDestroy()
+
     }
 }
