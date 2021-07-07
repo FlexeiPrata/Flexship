@@ -45,9 +45,12 @@
 
     <style name="MaterialDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="alertDialogStyle">@style/DialogShape</item>
-        <item name="titleTextColor">@color/white</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PositiveBStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/NegativeBStyle</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/FlextitleDialog</item>
+    </style>
+
+    <style name="FlextitleDialog" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textColor">@color/purple_wildberry</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="MaterialTextViewAccent" parent="Widget.MaterialComponents.TextView">
@@ -78,8 +81,8 @@
         <item name="shapeAppearance">@style/CustomShape</item>
     </style>
     <style name="CustomShape" parent="ShapeAppearance.MaterialComponents.MediumComponent">
-        <item name="cornerFamily">cut</item>
-        <item name="cornerSize">10dp</item>
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
     </style>
     <style name="PositiveBStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/purple_wildberry</item>

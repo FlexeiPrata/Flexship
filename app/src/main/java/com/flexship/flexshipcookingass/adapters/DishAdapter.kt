@@ -15,10 +15,10 @@ import com.flexship.flexshipcookingass.other.getTitleCategory
 class DishAdapter(
     private val context: Context,
     private val onDishClicked: OnDishClick
-) :RecyclerView.Adapter<DishAdapter.ViewHolderData>() {
+) : RecyclerView.Adapter<DishAdapter.ViewHolderData>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderData {
-        val view=LayoutInflater.from(context).inflate(R.layout.dish_adapter,parent,false)
+        val view = LayoutInflater.from(context).inflate(R.layout.dish_adapter, parent, false)
         return ViewHolderData(view)
     }
 
@@ -30,19 +30,24 @@ class DishAdapter(
         return differ.currentList.size
     }
 
-    inner class ViewHolderData(itemView: View):RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolderData(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val binding = DishAdapterBinding.bind(itemView)
 
-        fun setData(dish:Dish) = with(binding){
-            if(dish.image == null){
+        fun setData(dish: Dish) = with(binding) {
+            if (dish.image == null) {
                 dishImage.setImageResource(R.drawable.empty)
-            }
-            else{
+            } else {
                 dishImage.setImageBitmap(dish.image)
             }
 
-            dishName.text=dish.name
-            dishCategory.text= getTitleCategory(dish.category)
+            dishName.apply {
+                text = dish.name
+                if (dish.name.length > 20) textSize = 18F
+                if (dish.name.length > 30) textSize = 14F
+                if (dish.name.length > 40) textSize = 10F
+            }
+
+            dishCategory.text = getTitleCategory(dish.category)
 
             dishBDelete.setOnClickListener {
                 onDishClicked.onDishDeleted(dish)
@@ -57,7 +62,8 @@ class DishAdapter(
         }
 
     }
-    private val diffUtil = object :DiffUtil.ItemCallback<Dish>(){
+
+    private val diffUtil = object : DiffUtil.ItemCallback<Dish>() {
         override fun areItemsTheSame(oldItem: Dish, newItem: Dish): Boolean {
             return oldItem.id == newItem.id
         }
@@ -67,9 +73,10 @@ class DishAdapter(
         }
 
     }
-    val differ=AsyncListDiffer(this,diffUtil)
 
-    interface OnDishClick{
+    val differ = AsyncListDiffer(this, diffUtil)
+
+    interface OnDishClick {
         fun onDishStarted(dish: Dish)
         fun onDishDeleted(dish: Dish)
         fun onDishEdited(dish: Dish)

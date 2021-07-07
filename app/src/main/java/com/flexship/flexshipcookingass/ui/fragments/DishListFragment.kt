@@ -75,8 +75,8 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
 
         (requireActivity() as AppCompatActivity).supportActionBar?.apply {
             title = getTitleCategory(args.categoryId)
-            setDisplayHomeAsUpEnabled(true)
-            setHomeButtonEnabled(true)
+            //setDisplayHomeAsUpEnabled(true)
+            //setHomeButtonEnabled(true)
         }
 
         binding.recViewDishes.apply {

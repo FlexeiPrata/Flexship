@@ -121,9 +121,12 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
         }
         if (direction == ItemTouchHelper.LEFT) {
             if (viewHolder is ItemDragDropMoveViewHolder) viewHolder.onItemEdit()
+            itemEdit(viewHolder.adapterPosition)
         }
 
     }
+
+    abstract fun itemEdit(pos: Int)
 
     abstract fun itemDelete(pos: Int)
 

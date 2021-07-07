@@ -191,13 +191,13 @@ class DishFragment : Fragment() {
         )
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            findNavController().popBackStack()
+            findNavController().navigate(R.id.action_dishFragment_to_cookingFragment)
             return true
         }
         return super.onOptionsItemSelected(item)
-    }
+    }*/
 
     private fun setValues() = with(binding) {
         bitmap = dish.image
@@ -239,6 +239,7 @@ class DishFragment : Fragment() {
             stageAdapter = StageAdapter(context)
             adapter = stageAdapter
 
+
         }.also {
             val itemListner = ItemTouchHelper(object : DragAndDropSwappable(requireContext()) {
                 override fun swapList(startPosition: Int, targetPosition: Int) {
@@ -247,6 +248,10 @@ class DishFragment : Fragment() {
 
                 override fun saveInDatabase() {
 
+                }
+
+                override fun itemEdit(pos: Int) {
+                    //лень
                 }
 
                 override fun itemDelete(pos: Int) {
@@ -337,7 +342,7 @@ class DishFragment : Fragment() {
             insertNewStagesBeforeUpdate()
             viewModel.updateDish(dish, stageList, true)
         }
-        findNavController().navigate(R.id.action_dishFragment_to_categoryFragment)
+        findNavController().navigate(R.id.action_dishFragment_to_cookingFragment)
 
     }
 

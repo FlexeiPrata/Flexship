@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -19,8 +20,8 @@ import com.flexship.flexshipcookingass.adapters.StageAdapter
 import com.flexship.flexshipcookingass.databinding.FragmentCookingBinding
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
-import com.flexship.flexshipcookingass.other.Constans
-import com.flexship.flexshipcookingass.other.zeroOrNotZero
+import com.flexship.flexshipcookingass.other.*
+import com.flexship.flexshipcookingass.other.expandAction
 import com.flexship.flexshipcookingass.services.CookService
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,9 +43,10 @@ class CookingFragment : Fragment() {
     private var currentStage: Stages? = null
     private var currentPos: Int = 0
 
-    private var isCooking= false
-    private var isNewStage=true
+    private var isCooking = false
+    private var isNewStage = true
 
+    private var isExpanded = true
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,28 +75,33 @@ class CookingFragment : Fragment() {
 
         viewModel.getDishById(args.dishId).observe(viewLifecycleOwner) { dishWithStages ->
 
-            stageList = dishWithStages.stages
-            dish = dishWithStages.dish
-
+            dishWithStages?.let {
+                stageList = it.stages
+                dish = it.dish
+            }
             stageAdapter.differ.submitList(stageList)
 
             followToNewStage()
         }
         subscribeToObservers()
 
+
     }
 
-    private fun subscribeToObservers(){
+    private fun subscribeToObservers() {
         Log.d("Zalupa", "OnObserve")
-        CookService.timer.observe(viewLifecycleOwner){
-            time->
-            if(time==0L){
-                binding.textView2.isVisible=true
+        CookService.timer.observe(viewLifecycleOwner) { time ->
+            if (time == 0L) {
+                binding.textView2.isVisible = true
             }
-            binding.textViewTimer.text="${zeroOrNotZero(time / 1000 / 60)}:${zeroOrNotZero(time / 1000 % 60)}"
+            binding.textViewTimer.text = String.format(
+                getString(R.string.timer),
+                zeroOrNotZero(time / 1000 / 60),
+                zeroOrNotZero(time / 100 % 60)
+            )
 
         }
-        CookService.isCooking.observe(viewLifecycleOwner){
+        CookService.isCooking.observe(viewLifecycleOwner) {
             Log.d("Zalupa", "HUI + $it")
             updateToggle(it)
         }
@@ -102,55 +109,69 @@ class CookingFragment : Fragment() {
 
     private fun updateToggle(isCooking: Boolean) {
 
-        this.isCooking=isCooking
-        if(isCooking){
+        this.isCooking = isCooking
+        if (isCooking) {
             binding.fabPauseOrResume.setImageResource(R.drawable.ic_baseline_pause_24)
-        }else{
+        } else {
             binding.fabPauseOrResume.setImageResource(R.drawable.ic_baseline_play_arrow_24)
         }
     }
 
     override fun onStart() {
         super.onStart()
+        binding.apply {
 
-        binding.fabNext.setOnClickListener {
-            sendCommandToService(Constans.ACTION_STOP)
-            followToNewStage()
-            isNewStage=true
-        }
-
-        binding.fabPauseOrResume.setOnClickListener {
-            if(isCooking){
-                sendCommandToService(Constans.ACTION_PAUSE)
-            }else{
-                sendCommandToService(Constans.ACTION_START_RESUME)
+            fabNext.setOnClickListener {
+                sendCommandToService(Constans.ACTION_STOP)
+                followToNewStage()
+                isNewStage = true
             }
-        }
-        binding.fabStop.setOnClickListener {
-            sendCommandToService(Constans.ACTION_STOP)
-            findNavController().popBackStack()
+
+            fabPauseOrResume.setOnClickListener {
+                if (isCooking) {
+                    sendCommandToService(Constans.ACTION_PAUSE)
+                } else {
+                    sendCommandToService(Constans.ACTION_START_RESUME)
+                }
+            }
+            fabStop.setOnClickListener {
+                sendCommandToService(Constans.ACTION_STOP)
+                findNavController().popBackStack()
+            }
+
+            expandCollapse.setOnClickListener {
+                if (isExpanded) {
+                    collapse(rvBox)
+                    isExpanded = false
+                    it.animate().setDuration(200).rotation(180F)
+                } else {
+
+                    expand(rvBox)
+                    isExpanded = true
+                    it.animate().setDuration(200).rotation(0F)
+                }
+            }
         }
     }
 
     private fun followToNewStage() {
         try {
-            currentStage=stageAdapter.differ.currentList[currentPos++]
-        }
-        catch (ex: Exception){
+            currentStage = stageAdapter.differ.currentList[currentPos++]
+        } catch (ex: Exception) {
             ex.printStackTrace()
         }
-        binding.textViewName.text="Текущий этап - ".plus(currentStage?.name)
+        binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
         binding.textView2.isVisible = false
         binding.textViewTimer.text = ""
     }
 
-    private fun sendCommandToService(actionToDo:String){
-        Intent(requireContext(),CookService::class.java).apply {
-            action=actionToDo
-            if(isNewStage){
+    private fun sendCommandToService(actionToDo: String) {
+        Intent(requireContext(), CookService::class.java).apply {
+            action = actionToDo
+            if (isNewStage) {
                 Log.d("Zalupa", "Huinea rabotai ${currentStage!!.time * 1000L}")
-                putExtra(Constans.KEY_TIME,currentStage!!.time*1000L)
-                isNewStage=false
+                putExtra(Constans.KEY_TIME, currentStage!!.time * 1000L)
+                isNewStage = false
             }
         }.also {
             requireContext().startService(it)

@@ -15,7 +15,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textModalBoxRecipe"
             android:layout_width="0dp"
-            android:layout_height="240dp"
+            android:layout_height="200dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
@@ -70,7 +70,7 @@
             android:background="@color/black_mild"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/b_add_stage" />
+            app:layout_constraintTop_toBottomOf="@id/viewDivider3" />
 
         <View
             android:id="@+id/viewDivider3"
@@ -92,7 +92,8 @@
             android:text="@string/dish_final_apply"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewDivider2" />
+            app:layout_constraintTop_toBottomOf="@+id/b_add_stage"
+        />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/b_add_image"
@@ -129,6 +130,8 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/viewDivider"
+            app:stackFromEnd="true"
+            app:reverseLayout="true"
             tools:itemCount="10" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -141,7 +144,7 @@
             android:hint="@string/stage_title_hint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewDivider3">
+            app:layout_constraintTop_toBottomOf="@+id/viewDivider2">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/ed_stages"
@@ -189,6 +192,13 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textModalBoxRecipe" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/b_insert_dish" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

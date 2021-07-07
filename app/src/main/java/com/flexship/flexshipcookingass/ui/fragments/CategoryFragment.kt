@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.adapters.CategoryAdapter
 import com.flexship.flexshipcookingass.databinding.FragmentCategoryBinding
@@ -51,6 +53,7 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
             layoutManager = LinearLayoutManager(context)
             categoryAdapter = CategoryAdapter(context, this@CategoryFragment)
             adapter = categoryAdapter
+            addItemDecoration(DividerItemDecoration(requireContext(), RecyclerView.VERTICAL))
         }
 
         viewModel.dishesToObserve.observe(viewLifecycleOwner) { dishes ->
