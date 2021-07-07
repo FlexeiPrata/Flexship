@@ -18,6 +18,7 @@ import com.flexship.flexshipcookingass.other.Constans.ACTION_STOP
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_ID
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_NAME
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_ID
+import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -126,7 +127,8 @@ class CookService : LifecycleService() {
         timeStarted = System.currentTimeMillis()
 
         CoroutineScope(Dispatchers.Main).launch {
-            while (isCooking.value!!) {
+            while (isCooking.valu
+                e!!) {
                 if (timeToCook == totalTime) {
                     //stop timer
                 }
@@ -154,7 +156,8 @@ class CookService : LifecycleService() {
 
         timer.observe(this){
             time->
-            val notification=currentNotificationBuilder.setContentText()
+            val notification = currentNotificationBuilder.setContentText("${zeroOrNotZero(time/1000/60)}:${zeroOrNotZero(time/1000%60)}")
+            notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
     }
 

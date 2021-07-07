@@ -83,6 +83,11 @@ fun zeroOrNotZero(i: Int): String {
     else return "0$i"
 }
 
+fun zeroOrNotZero(i: Long): String {
+    if (i > 9) return i.toString()
+    else return "0$i"
+}
+
 fun getTitleCategory(id: Int): String {
     return when (id) {
         0 -> "Супы"
