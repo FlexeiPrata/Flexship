@@ -36,4 +36,6 @@ class CookRepository @Inject constructor(
 
     suspend fun deleteStage(stages: Stages) = cookDao.deleteStage(stages)
 
+    fun getAllCategories() = cookDao.getAllCategories()
+
 }

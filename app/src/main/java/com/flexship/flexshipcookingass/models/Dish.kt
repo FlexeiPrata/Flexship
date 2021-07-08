@@ -10,7 +10,7 @@ data class Dish(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     val name: String = "",
     val recipe: String = "",
-    val category: Int = 0,
+    @ColumnInfo(name = "category") val category: Int = 0,
     val image: Bitmap? = null,
     @ColumnInfo(name = "position_in_list") val positionInList: Int = 0
 )

@@ -17,6 +17,8 @@ import kotlin.math.roundToInt
 const val DATABASE_NAME = "cook_database"
 const val DISH_ID_SAFE_ARG = "dishId"
 const val MINUTES = "MINUTES"
+const val CATEGORY_ID = "categoryId"
+const val LOG_ID = "MyLog"
 
 fun expandAction(view: View, height: Int) {
     view.measure(ViewGroup.LayoutParams.MATCH_PARENT, height)

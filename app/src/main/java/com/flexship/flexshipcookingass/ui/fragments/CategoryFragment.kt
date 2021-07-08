@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -17,6 +16,7 @@ import com.flexship.flexshipcookingass.adapters.CategoryAdapter
 import com.flexship.flexshipcookingass.databinding.FragmentCategoryBinding
 import com.flexship.flexshipcookingass.models.Category
 import com.flexship.flexshipcookingass.models.Dish
+import com.flexship.flexshipcookingass.other.CATEGORY_ID
 import com.flexship.flexshipcookingass.other.getTitleCategory
 import com.flexship.flexshipcookingass.ui.viewmodels.CategoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,9 +34,8 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_category, container, false)
 
+        val view = inflater.inflate(R.layout.fragment_category, container, false)
         binding = FragmentCategoryBinding.bind(view)
 
         return view
@@ -47,18 +46,13 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
 
         requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
             navigationIcon = null
-            title="Категории"
+            title = getString(R.string.category)
         }
 
-        binding.recViewCategory.apply {
-            layoutManager = LinearLayoutManager(context)
-            categoryAdapter = CategoryAdapter(context, this@CategoryFragment)
-            adapter = categoryAdapter
-            addItemDecoration(DividerItemDecoration(requireContext(), RecyclerView.VERTICAL))
-        }
-
-        viewModel.dishesToObserve.observe(viewLifecycleOwner) { dishes ->
-            getCategories(dishes)
+        viewModel.categoriesID.observe(viewLifecycleOwner) {
+            it?.let {
+                updateUI(it)
+            }
         }
 
     }
@@ -70,38 +64,44 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
         }
     }
 
-    private fun getCategories(dishes: List<Dish>) {
-        var tr = false
-        for (dish in dishes) {
-            for (category in categories) {
-                if (dish.category == category.id)
-                    tr = true
-            }
-            if (!tr) {
-                val name = getTitleCategory(dish.category)
-                val image = when (dish.category) {
-                    0 -> R.drawable.soup
-                    1 -> R.drawable.snack
-                    2 -> R.drawable.salad
-                    3 -> R.drawable.pizza
-                    4 -> R.drawable.thanksgiving
-                    5 -> R.drawable.breakfast
-                    6 -> R.drawable.vegan
-                    else -> R.drawable.empty
-                }
-                val cat = Category(name, image, dish.category)
-                categories.add(cat)
-            }
-            tr = false
-        }
-        categoryAdapter.differ.submitList(categories.toList())
-    }
-
     override fun onCategoryClicked(categoryId: Int) {
         val bundle = Bundle().apply {
-            putInt("categoryId", categoryId)
+            putInt(CATEGORY_ID, categoryId)
         }
         findNavController().navigate(R.id.action_categoryFragment_to_recipeListFragment, bundle)
+    }
+
+    private fun updateUI(list: List<Int>) {
+        categories.clear()
+        val catListInts = mutableListOf<Int>()
+        for (i in list) {
+            if (!catListInts.contains(i)) catListInts.add(i)
+        }
+
+        for (i in catListInts) {
+            val name = getTitleCategory(i)
+            val image = when (i) {
+                0 -> R.drawable.soup
+                1 -> R.drawable.snack
+                2 -> R.drawable.salad
+                3 -> R.drawable.pizza
+                4 -> R.drawable.thanksgiving
+                5 -> R.drawable.breakfast
+                6 -> R.drawable.vegan
+                else -> R.drawable.empty
+            }
+            val cat = Category(name, image, i)
+            categories.add(cat)
+        }
+
+        binding.recViewCategory.apply {
+            layoutManager = LinearLayoutManager(context)
+            categoryAdapter = CategoryAdapter(context, this@CategoryFragment)
+            adapter = categoryAdapter
+            addItemDecoration(DividerItemDecoration(requireContext(), RecyclerView.VERTICAL))
+        }
+        categoryAdapter.differ.submitList(categories.toList())
+
     }
 
 }

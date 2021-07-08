@@ -8,8 +8,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -22,7 +20,6 @@ import com.flexship.flexshipcookingass.databinding.FragmentCookingBinding
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
 import com.flexship.flexshipcookingass.other.*
-import com.flexship.flexshipcookingass.other.expandAction
 import com.flexship.flexshipcookingass.services.CookService
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,6 +45,7 @@ class CookingFragment : Fragment() {
     private var isNewStage = true
 
     private var isExpanded = true
+    private var time = 0L
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -64,7 +62,7 @@ class CookingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
-            title="Приготовление блюда"
+            title = "Приготовление блюда"
             setNavigationIcon(R.drawable.ic_back)
             setNavigationOnClickListener {
                 findNavController().popBackStack()
@@ -87,6 +85,8 @@ class CookingFragment : Fragment() {
 
             followToNewStage(args.posInList)
         }
+
+
         subscribeToObservers()
 
 
@@ -94,15 +94,16 @@ class CookingFragment : Fragment() {
 
     private fun subscribeToObservers() {
         CookService.timer.observe(viewLifecycleOwner) { time ->
-            if (time == 0L) {
-                binding.textView2.isVisible = true
+            this.time = time
+            if (time <= 0L) {
+                binding.textViewFinisher.isVisible = true
             }
+
             binding.textViewTimer.text = String.format(
                 getString(R.string.timer),
                 zeroOrNotZero(time / 1000 / 60),
-                zeroOrNotZero(time / 100 % 60)
+                zeroOrNotZero(time / 1000 % 60)
             )
-
         }
         CookService.isCooking.observe(viewLifecycleOwner) {
             updateToggle(it)
@@ -124,12 +125,14 @@ class CookingFragment : Fragment() {
         binding.apply {
 
             fabNext.setOnClickListener {
+                CookService.isWorking = false
                 sendCommandToService(Constans.ACTION_STOP)
                 followToNewStage()
                 isNewStage = true
             }
 
             fabPauseOrResume.setOnClickListener {
+                if (time <= 0L && CookService.isWorking) return@setOnClickListener
                 if (isCooking) {
                     sendCommandToService(Constans.ACTION_PAUSE)
                 } else {
@@ -137,6 +140,7 @@ class CookingFragment : Fragment() {
                 }
             }
             fabStop.setOnClickListener {
+
                 sendCommandToService(Constans.ACTION_STOP)
                 findNavController().popBackStack()
             }
@@ -156,9 +160,10 @@ class CookingFragment : Fragment() {
         }
     }
 
-    private fun followToNewStage(posInList:Int=-1) {
-        if(posInList!=-1){
-            currentPos=posInList
+    private fun followToNewStage(posInList: Int = -1) {
+        Log.d(LOG_ID, "Rabota = ${CookService.isWorking}")
+        if (posInList != -1) {
+            currentPos = posInList
         }
         try {
             currentStage = stageAdapter.differ.currentList[currentPos++]
@@ -167,16 +172,25 @@ class CookingFragment : Fragment() {
         }
 
         binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
-        binding.textView2.isVisible = false
+        binding.textViewFinisher.isVisible = false
         binding.textViewTimer.text = ""
+
+        Log.d(LOG_ID, "Zalupockika")
+        if (CookService.isWorking && time <= 0L){
+            Log.d(LOG_ID, "Jopa")
+            binding.textViewFinisher.isVisible = true
+            binding.textViewTimer.text = "00:00"
+        }
+        Log.d(LOG_ID, "Rabota2 = ${CookService.isWorking}")
+
     }
 
     private fun sendCommandToService(actionToDo: String) {
         Intent(requireContext(), CookService::class.java).apply {
             action = actionToDo
             if (isNewStage) {
-                putExtra(Constans.KEY_DISH_ID,args.dishId)
-                putExtra(Constans.KEY_POSITION_IN_LIST,currentPos-1)
+                putExtra(Constans.KEY_DISH_ID, args.dishId)
+                putExtra(Constans.KEY_POSITION_IN_LIST, currentPos - 1)
                 putExtra(Constans.KEY_TIME, currentStage!!.time * 1000L)
                 isNewStage = false
             }

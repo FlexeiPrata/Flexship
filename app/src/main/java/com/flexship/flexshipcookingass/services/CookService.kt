@@ -35,16 +35,13 @@ class CookService : LifecycleService() {
     private var isCanceled = false
 
     private var timeToCook = 0L
-    private var dishId = 0
-    private var posInList = 0
 
     //timer
     private var isTimerEnabled = false
 
-//    @Inject
-//    lateinit var notificationBuilder: NotificationCompat.Builder
     private lateinit var notificationBuilder: NotificationCompat.Builder
     private lateinit var currentNotificationBuilder: NotificationCompat.Builder
+
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
@@ -52,8 +49,9 @@ class CookService : LifecycleService() {
                 ACTION_START_RESUME -> {
                     if (isFirstCooking) {
                         timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
-                        dishId=it.getIntExtra(KEY_DISH_ID,0)
-                        posInList=it.getIntExtra(KEY_POSITION_IN_LIST,0)
+                        currentDishId = it.getIntExtra(KEY_DISH_ID, 0)
+                        posInList = it.getIntExtra(KEY_POSITION_IN_LIST, 0)
+
                         startForegroundService()
                     } else {
                         runTimer()
@@ -121,6 +119,9 @@ class CookService : LifecycleService() {
     companion object {
         val isCooking = MutableLiveData<Boolean>()
         val timer = MutableLiveData<Long>()
+        var isWorking = false
+        var currentDishId = 0
+        var posInList = 0
     }
 
     private fun postInitialValues() {
@@ -133,9 +134,9 @@ class CookService : LifecycleService() {
         isTimerEnabled = true
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
-                timeToCook-=1000L
+                timeToCook -= 1000L
                 timer.postValue(timeToCook)
-                if(timeToCook==0L)
+                if (timeToCook <= 0L)
                     pauseService()
                 delay(Constans.DELAY_FOR_TIMER)
             }
@@ -144,7 +145,8 @@ class CookService : LifecycleService() {
 
     private fun startForegroundService() {
 
-        isFirstCooking=false
+        isFirstCooking = false
+        isWorking = true
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -152,7 +154,7 @@ class CookService : LifecycleService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
-        notificationBuilder=NotificationCompat.Builder(this,NOTIFICATION_CHANNEL_ID)
+        notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setAutoCancel(true)
             .setOngoing(true)
             .setSmallIcon(R.drawable.breakfast)
@@ -160,26 +162,32 @@ class CookService : LifecycleService() {
             .setContentText("00:00")
             .setContentIntent(getPendingIntent())
 
-        currentNotificationBuilder=notificationBuilder
+        currentNotificationBuilder = notificationBuilder
 
         runTimer()
 
         startForeground(NOTIFICATION_ID, notificationBuilder.build())
 
         timer.observe(this) { time ->
-            val notification = currentNotificationBuilder.setContentText(
+            val notification = if (time > 0L)
+                currentNotificationBuilder.setContentText(
                 "${zeroOrNotZero(time / 1000 / 60)}:${zeroOrNotZero(time / 1000 % 60)}"
+            )
+            else currentNotificationBuilder.setContentText(
+                getString(R.string.notification_finished)
             )
             notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
+
     }
 
-    private fun getPendingIntent() = PendingIntent.getActivity(this,
+    private fun getPendingIntent() = PendingIntent.getActivity(
+        this,
         0,
-        Intent(this,MainActivity::class.java).apply {
-                                                    putExtra(KEY_DISH_ID,dishId)
-            putExtra(KEY_POSITION_IN_LIST,posInList)
-            action= ACTION_PENDING_INTENT
+        Intent(this, MainActivity::class.java).apply {
+            putExtra(KEY_DISH_ID, currentDishId)
+            putExtra(KEY_POSITION_IN_LIST, posInList)
+            action = ACTION_PENDING_INTENT
         },
         PendingIntent.FLAG_UPDATE_CURRENT
     )
@@ -196,8 +204,9 @@ class CookService : LifecycleService() {
     }
 
 
-    private fun cancelService(){
-        isCanceled=true
+    private fun cancelService() {
+        isWorking = false
+        isCanceled = true
         postInitialValues()
         stopForeground(true)
         stopSelf()

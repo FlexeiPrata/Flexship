@@ -21,8 +21,10 @@ import com.flexship.flexshipcookingass.databinding.FragmentDishListBinding
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.other.Constans
 import com.flexship.flexshipcookingass.other.getTitleCategory
+import com.flexship.flexshipcookingass.services.CookService
 import com.flexship.flexshipcookingass.ui.dialogs.DialogFragmentToDelete
 import com.flexship.flexshipcookingass.ui.viewmodels.DishListViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -119,10 +121,29 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
     }
 
     override fun onDishStarted(dish: Dish) {
-        val bundle = Bundle().apply {
-            putInt("dishId", dish.id)
+
+        if (!CookService.isWorking) {
+            val bundle = Bundle().apply {
+                putInt("dishId", dish.id)
+            }
+            findNavController().navigate(R.id.action_recipeListFragment_to_cookingFragment, bundle)
         }
-        findNavController().navigate(R.id.action_recipeListFragment_to_cookingFragment, bundle)
+        else {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(getString(R.string.alert_title_is_cooking))
+                .setMessage(getString(R.string.alert_message_is_cooking))
+                .setPositiveButton(R.string.yes){_, _ ->
+                    val bundle = Bundle().apply {
+                        putInt("dishId", CookService.currentDishId)
+                        putInt("posInList", CookService.posInList)
+                    }
+                    findNavController().navigate(R.id.action_recipeListFragment_to_cookingFragment, bundle)
+                }
+                .setNegativeButton(R.string.no, null)
+                .show()
+        }
+
+
     }
 
     override fun onDishDeleted(dish: Dish) {

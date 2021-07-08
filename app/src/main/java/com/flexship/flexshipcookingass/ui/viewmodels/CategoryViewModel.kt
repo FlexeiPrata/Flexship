@@ -11,5 +11,5 @@ class CategoryViewModel @Inject constructor(
     val cookRepository: CookRepository
 ): ViewModel() {
 
-    val dishesToObserve = cookRepository.getDishes().asLiveData()
+    val categoriesID = cookRepository.getAllCategories().asLiveData()
 }
