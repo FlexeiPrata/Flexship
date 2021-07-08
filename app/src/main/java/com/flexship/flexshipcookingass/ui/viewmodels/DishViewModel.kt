@@ -50,4 +50,11 @@ class DishViewModel @Inject constructor(
             }
         }
     }
+
+    fun deleteDish(dish: Dish,deleteStages:Boolean=false) = viewModelScope.launch(Dispatchers.IO){
+        cookRepository.deleteDish(dish)
+        if(deleteStages){
+            cookRepository.deleteStages(dish.id)
+        }
+    }
 }

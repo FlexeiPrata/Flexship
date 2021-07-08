@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -66,6 +67,7 @@ class DishFragment : Fragment() {
     private var bufStageList: MutableList<Stages> = mutableListOf()
 
     private var isNewDish: Boolean = true
+    private var isCreatedNewDish:Boolean=false
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -162,12 +164,12 @@ class DishFragment : Fragment() {
             binding.bInsertDish.text = "Обновить"
         } else {
             dish = Dish()
-            //viewModel.insertDish(dish)
+            viewModel.insertDish(dish)
             setTitle("Новое блюдо")
             viewModel.getNewDish().observe(viewLifecycleOwner) {
-                dishId = 1
+                dishId=1
                 it?.let {
-                    dishId = it + 1
+                    dishId = it
                 }
             }
         }
@@ -176,9 +178,12 @@ class DishFragment : Fragment() {
     }
 
     private fun setTitle(titleT: String) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            title = titleT
+        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
+            title=titleT
+            setNavigationIcon(R.drawable.ic_back)
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
         }
     }
 
@@ -191,13 +196,6 @@ class DishFragment : Fragment() {
         )
     }
 
-    /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            findNavController().navigate(R.id.action_dishFragment_to_cookingFragment)
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }*/
 
     private fun setValues() = with(binding) {
         bitmap = dish.image
@@ -241,7 +239,7 @@ class DishFragment : Fragment() {
 
 
         }.also {
-            val itemListner = ItemTouchHelper(object : DragAndDropSwappable(requireContext()) {
+            val itemListener = ItemTouchHelper(object : DragAndDropSwappable(requireContext()) {
                 override fun swapList(startPosition: Int, targetPosition: Int) {
 
                 }
@@ -264,7 +262,7 @@ class DishFragment : Fragment() {
                 }
 
             })
-            itemListner.attachToRecyclerView(it)
+            itemListener.attachToRecyclerView(it)
         }
 
 
@@ -289,16 +287,20 @@ class DishFragment : Fragment() {
         binding.apply {
             val stageName = edStages.text.toString()
             if (stageName.isNotEmpty()) {
-                val stage = Stages(name = stageName, time = timeSec.toLong(), dishId = dishId)
-                stageList.add(stage)
-                stageAdapter.differ.submitList(stageList.toList())
-                timeSec = 0
-                edStages.setText("")
-                bTime.setText(R.string.dish_choose_time)
+                submitNewStage(stageName)
             } else {
                 Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT).show()
             }
         }
+    }
+    private fun submitNewStage(stageName:String){
+        val stage = Stages(name = stageName, time = timeSec.toLong(), dishId = dishId)
+        viewModel.insertStage(stage)
+        stageList.add(stage)
+        stageAdapter.differ.submitList(stageList.toList())
+        timeSec = 0
+        binding.edStages.setText("")
+        binding.bTime.setText(R.string.dish_choose_time)
     }
 
     private fun checkFieldsToAddNewDishOrUpdate() = with(binding) {
@@ -330,19 +332,12 @@ class DishFragment : Fragment() {
     private fun updateDish(name: String, desc: String) = with(binding) {
         val spinnerPos = spinnerCategory.selectedItemPosition
         val dish = Dish(dishId, name, desc, spinnerPos, bitmap)
+        this@DishFragment.dish=dish
 
-        if (isNewDish) {
-            viewModel.insertDish(dish)
-
-            for (i in stageList)
-                i.isSaved = 1
-
-            viewModel.insertStages(stageList)
-        } else {
-            insertNewStagesBeforeUpdate()
-            viewModel.updateDish(dish, stageList, true)
-        }
-        findNavController().navigate(R.id.action_dishFragment_to_cookingFragment)
+        viewModel.updateDish(dish)
+        if(isNewDish)
+            isCreatedNewDish=true
+        findNavController().popBackStack()
 
     }
 
@@ -369,6 +364,19 @@ class DishFragment : Fragment() {
             setTimeToButton(timeSec)
         }
     }.show(parentFragmentManager, Constans.TAG_MINUTE_PICKER)
+
+    override fun onStop() {
+        super.onStop()
+
+        if(!isCreatedNewDish && isNewDish){
+            dish.id=dishId
+            if(stageList.size>0){
+                viewModel.deleteDish(dish,true)
+            }else{
+                viewModel.deleteDish(dish)
+            }
+        }
+    }
 
 
     //ЭТО не ТРОГАТЬ

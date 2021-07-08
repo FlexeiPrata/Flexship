@@ -34,6 +34,10 @@
             android:name="dishId"
             app:argType="integer"
             android:defaultValue="-1" />
+        <argument
+            android:name="posInList"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
     <fragment
         android:id="@+id/dishFragment"

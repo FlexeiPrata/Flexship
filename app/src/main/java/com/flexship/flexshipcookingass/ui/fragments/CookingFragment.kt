@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -62,9 +63,12 @@ class CookingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-            title = "Приготовление блюда"
-            setDisplayHomeAsUpEnabled(true)
+        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
+            title="Приготовление блюда"
+            setNavigationIcon(R.drawable.ic_back)
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
         }
 
         binding.recViewStage.apply {
@@ -81,7 +85,7 @@ class CookingFragment : Fragment() {
             }
             stageAdapter.differ.submitList(stageList)
 
-            followToNewStage()
+            followToNewStage(args.posInList)
         }
         subscribeToObservers()
 
@@ -89,7 +93,6 @@ class CookingFragment : Fragment() {
     }
 
     private fun subscribeToObservers() {
-        Log.d("Zalupa", "OnObserve")
         CookService.timer.observe(viewLifecycleOwner) { time ->
             if (time == 0L) {
                 binding.textView2.isVisible = true
@@ -102,7 +105,6 @@ class CookingFragment : Fragment() {
 
         }
         CookService.isCooking.observe(viewLifecycleOwner) {
-            Log.d("Zalupa", "HUI + $it")
             updateToggle(it)
         }
     }
@@ -154,12 +156,16 @@ class CookingFragment : Fragment() {
         }
     }
 
-    private fun followToNewStage() {
+    private fun followToNewStage(posInList:Int=-1) {
+        if(posInList!=-1){
+            currentPos=posInList
+        }
         try {
             currentStage = stageAdapter.differ.currentList[currentPos++]
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
+
         binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
         binding.textView2.isVisible = false
         binding.textViewTimer.text = ""
@@ -169,7 +175,8 @@ class CookingFragment : Fragment() {
         Intent(requireContext(), CookService::class.java).apply {
             action = actionToDo
             if (isNewStage) {
-                Log.d("Zalupa", "Huinea rabotai ${currentStage!!.time * 1000L}")
+                putExtra(Constans.KEY_DISH_ID,args.dishId)
+                putExtra(Constans.KEY_POSITION_IN_LIST,currentPos-1)
                 putExtra(Constans.KEY_TIME, currentStage!!.time * 1000L)
                 isNewStage = false
             }

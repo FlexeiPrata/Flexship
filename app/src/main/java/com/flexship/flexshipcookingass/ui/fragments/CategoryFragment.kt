@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -44,9 +45,9 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(false)
-            title = "Категории"
+        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
+            navigationIcon = null
+            title="Категории"
         }
 
         binding.recViewCategory.apply {

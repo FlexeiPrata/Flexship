@@ -13,8 +13,11 @@ object Constans {
     const val ACTION_START_RESUME = "ACTION_START_RESUME"
     const val ACTION_PAUSE = "ACTION_PAUSE"
     const val ACTION_STOP = "ACTION_STOP"
+
     const val KEY_DISH_ID = "KEY_DISH_ID"
     const val KEY_TIME = "KEY_TIME"
+    const val KEY_POSITION_IN_LIST="KEY_POSITION_IN_LIST"
+
 
     const val DELAY_FOR_TIMER = 1000L
 

@@ -25,15 +25,33 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
 
+        navigateToCookingFragment(intent)
+
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        navigateToCookingFragment(intent)
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return (Navigation.findNavController(this, R.id.fragmentContainerView).navigateUp()
                 || super.onSupportNavigateUp())
+    }
+
+    private fun navigateToCookingFragment(intent: Intent?){
+        intent?.let{
+            if(it.action==Constans.ACTION_PENDING_INTENT){
+                val dishId=it.getIntExtra(Constans.KEY_DISH_ID,-1)
+                val posInList=it.getIntExtra(Constans.KEY_POSITION_IN_LIST,-1)
+                val bundle=Bundle().apply {
+                    putInt("dishId",dishId)
+                    putInt("posInList",posInList)
+                }
+                navController.navigate(R.id.action_to_cookingFragment,bundle)
+            }
+        }
+
     }
 
 }

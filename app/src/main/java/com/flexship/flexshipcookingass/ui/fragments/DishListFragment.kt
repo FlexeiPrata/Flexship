@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -73,10 +74,12 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
             }
         }
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-            title = getTitleCategory(args.categoryId)
-            //setDisplayHomeAsUpEnabled(true)
-            //setHomeButtonEnabled(true)
+        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
+            title= getTitleCategory(args.categoryId)
+            setNavigationIcon(R.drawable.ic_back)
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
         }
 
         binding.recViewDishes.apply {
@@ -106,14 +109,6 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            Log.d("MyLog","HUI")
-            findNavController().popBackStack()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     override fun onStart() {
         super.onStart()

@@ -11,11 +11,15 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
+import com.flexship.flexshipcookingass.MainActivity
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.other.Constans
 import com.flexship.flexshipcookingass.other.Constans.ACTION_PAUSE
+import com.flexship.flexshipcookingass.other.Constans.ACTION_PENDING_INTENT
 import com.flexship.flexshipcookingass.other.Constans.ACTION_START_RESUME
 import com.flexship.flexshipcookingass.other.Constans.ACTION_STOP
+import com.flexship.flexshipcookingass.other.Constans.KEY_DISH_ID
+import com.flexship.flexshipcookingass.other.Constans.KEY_POSITION_IN_LIST
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_ID
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_NAME
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_ID
@@ -31,13 +35,15 @@ class CookService : LifecycleService() {
     private var isCanceled = false
 
     private var timeToCook = 0L
+    private var dishId = 0
+    private var posInList = 0
 
     //timer
     private var isTimerEnabled = false
 
-    @Inject
-    lateinit var notificationBuilder: NotificationCompat.Builder
-
+//    @Inject
+//    lateinit var notificationBuilder: NotificationCompat.Builder
+    private lateinit var notificationBuilder: NotificationCompat.Builder
     private lateinit var currentNotificationBuilder: NotificationCompat.Builder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -46,7 +52,8 @@ class CookService : LifecycleService() {
                 ACTION_START_RESUME -> {
                     if (isFirstCooking) {
                         timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
-                        Log.d("Zalupa", "Vremea $timeToCook")
+                        dishId=it.getIntExtra(KEY_DISH_ID,0)
+                        posInList=it.getIntExtra(KEY_POSITION_IN_LIST,0)
                         startForegroundService()
                     } else {
                         runTimer()
@@ -71,7 +78,6 @@ class CookService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
 
-        currentNotificationBuilder=notificationBuilder
 
         postInitialValues()
 
@@ -125,7 +131,6 @@ class CookService : LifecycleService() {
     private fun runTimer() {
         isCooking.postValue(true)
         isTimerEnabled = true
-        Log.d("Zalupa", "OnRun")
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
                 timeToCook-=1000L
@@ -147,6 +152,15 @@ class CookService : LifecycleService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
+        notificationBuilder=NotificationCompat.Builder(this,NOTIFICATION_CHANNEL_ID)
+            .setAutoCancel(true)
+            .setOngoing(true)
+            .setSmallIcon(R.drawable.breakfast)
+            .setContentTitle("Currently cooking")
+            .setContentText("00:00")
+            .setContentIntent(getPendingIntent())
+
+        currentNotificationBuilder=notificationBuilder
 
         runTimer()
 
@@ -159,6 +173,16 @@ class CookService : LifecycleService() {
             notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
     }
+
+    private fun getPendingIntent() = PendingIntent.getActivity(this,
+        0,
+        Intent(this,MainActivity::class.java).apply {
+                                                    putExtra(KEY_DISH_ID,dishId)
+            putExtra(KEY_POSITION_IN_LIST,posInList)
+            action= ACTION_PENDING_INTENT
+        },
+        PendingIntent.FLAG_UPDATE_CURRENT
+    )
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(notificationManager: NotificationManager) {
@@ -173,17 +197,10 @@ class CookService : LifecycleService() {
 
 
     private fun cancelService(){
-        Log.d("Zalupa", "OnCancel")
-        //pauseService()
         isCanceled=true
         postInitialValues()
         stopForeground(true)
         stopSelf()
     }
 
-    override fun onDestroy() {
-        Log.d("Zalupa", "OnDestroy")
-        super.onDestroy()
-
-    }
 }
