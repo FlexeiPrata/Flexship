@@ -57,4 +57,10 @@ class DishViewModel @Inject constructor(
             cookRepository.deleteStages(dish.id)
         }
     }
+
+    fun deleteNotSavedStages(ids: List<Int>) = viewModelScope.launch(Dispatchers.IO){
+        cookRepository.deleteNotSavedStages(ids)
+    }
+
+    val maxIdOfStage = cookRepository.getMaxIdOfStage().asLiveData()
 }

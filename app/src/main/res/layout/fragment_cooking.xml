@@ -33,6 +33,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -52,7 +53,7 @@
         style="@style/MaterialTextViewAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="140dp"
+        android:layout_marginBottom="130dp"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/fabPauseOrResume"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +65,7 @@
         style="@style/MaterialTextViewSemiAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="50dp"
         android:textSize="80sp"
         app:layout_constraintBottom_toTopOf="@+id/textViewName"
         app:layout_constraintEnd_toEndOf="parent"
@@ -104,5 +105,34 @@
         app:layout_constraintEnd_toEndOf="@+id/textViewTimer"
         app:layout_constraintStart_toStartOf="@+id/textViewTimer"
         app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+
+    <LinearLayout
+        android:id="@+id/layout_empty"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rvBox">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/baker" />
+
+        <TextView
+            android:id="@+id/textView"
+            style="@style/MaterialTextViewAccent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:text="У вас отсутствуют этапа приготовления для этого блюда. Дам по попе!!"
+            android:textSize="20sp" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

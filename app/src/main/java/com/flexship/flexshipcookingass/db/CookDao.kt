@@ -24,6 +24,9 @@ interface CookDao {
     @Delete
     suspend fun deleteDish(dish: Dish)
 
+//    @Delete
+//    suspend fun deleteNotSavedStages(stages: List<Stages>)
+
     @Query("SELECT * FROM dish_table")
     fun getDishes(): Flow<List<Dish>>
 
@@ -39,20 +42,25 @@ interface CookDao {
     //получаем лист стадий по ID
     @Transaction
     @Query("SELECT * FROM dish_table where id = :dishId")
-    fun getDishWithStages(dishId:Int): Flow<DishWithStages>
+    fun getDishWithStages(dishId: Int): Flow<DishWithStages>
 
     @Query("SELECT * FROM dish_table where category = :category")
-    fun getDishesByCategory(category:Int): Flow<List<Dish>>
+    fun getDishesByCategory(category: Int): Flow<List<Dish>>
 
     @Query("SELECT * FROM dish_table where category = :category ORDER BY name ASC")
-    fun getDishesByCategorySortedByName(category:Int): Flow<List<Dish>>
+    fun getDishesByCategorySortedByName(category: Int): Flow<List<Dish>>
 
     @Query("Select category From dish_table")
-    fun getAllCategories() : Flow<List<Int>>
+    fun getAllCategories(): Flow<List<Int>>
 
     @Delete
     suspend fun deleteStage(stage: Stages)
 
+    @Query("DELETE FROM stages_table where id in (:ids)")
+    suspend fun deleteNotSavedStages(ids: List<Int>)
+
+    @Query("SELECT MAX(id) from stages_table")
+    fun getMaxIdOfStage(): Flow<Int?>
 
 
 }

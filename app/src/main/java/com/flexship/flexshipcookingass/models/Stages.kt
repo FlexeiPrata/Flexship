@@ -9,5 +9,5 @@ data class Stages(
     val name: String = "",
     val time: Long = 0L,
     val dishId: Int = 0,
-    var isSaved: Int = 0
+    var isCooking:Boolean=false
 )

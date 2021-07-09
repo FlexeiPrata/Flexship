@@ -22,4 +22,8 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="notification_finished">Этап завершён</string>
+    <string name="dialog_del_title">Не сохраненные данные</string>
+    <string name="dialog_del_mes">У вас присутствуют не сохраненные данные.Все несохраненные данные будут утерены.Желаете продолжить?</string>
+    <string name="dialog_del_dish_title">Удаление блюда</string>
+    <string name="dialog_del_dish_mes">Вы действительно хотите удалить данное блюдо?</string>
 </resources>

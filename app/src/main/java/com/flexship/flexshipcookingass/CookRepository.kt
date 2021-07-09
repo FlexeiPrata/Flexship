@@ -38,4 +38,8 @@ class CookRepository @Inject constructor(
 
     fun getAllCategories() = cookDao.getAllCategories()
 
+    suspend fun deleteNotSavedStages(ids: List<Int>) = cookDao.deleteNotSavedStages(ids)
+
+    fun getMaxIdOfStage() = cookDao.getMaxIdOfStage()
+
 }

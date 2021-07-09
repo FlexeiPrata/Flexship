@@ -2,12 +2,16 @@ package com.flexship.flexshipcookingass
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import com.flexship.flexshipcookingass.databinding.ActivityMainBinding
 import com.flexship.flexshipcookingass.other.Constans
+import com.flexship.flexshipcookingass.other.LOG_ID
+import com.flexship.flexshipcookingass.services.CookService
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -26,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
 
         navigateToCookingFragment(intent)
+
+        //checkIfServiceAvailable()
 
     }
 
@@ -53,5 +59,22 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+    private fun checkIfServiceAvailable(){
+        if(CookService.isWorking){
+            alertDialogToReturn()
+        }
+    }
+    private fun alertDialogToReturn() = MaterialAlertDialogBuilder(this)
+        .setTitle("Не завершенная готовка")
+        .setMessage("Вы не завершили предыдущую готовку." +
+                "Пока вы не завершите текущую готовку,вы не сможете начать новую." +
+                "Желаете вернуться к ней?")
+        .setPositiveButton(R.string.yes){
+            _,_->
+            navigateToCookingFragment(intent)
+        }
+        .setNegativeButton(R.string.no,null)
+        .create()
+        .show()
 
 }

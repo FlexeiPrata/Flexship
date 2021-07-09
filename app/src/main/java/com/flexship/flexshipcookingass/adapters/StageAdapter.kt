@@ -2,6 +2,7 @@ package com.flexship.flexshipcookingass.adapters
 
 import android.content.Context
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.StageAdapterBinding
 import com.flexship.flexshipcookingass.helpers.DragAndDropSwappable
 import com.flexship.flexshipcookingass.models.Stages
+import com.flexship.flexshipcookingass.other.LOG_ID
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 
 class StageAdapter(
@@ -42,6 +44,9 @@ class StageAdapter(
                 imageView4.visibility = View.GONE
             }
             stageName.text = stages.name
+            Log.d(LOG_ID,"Adapter"+stages.isCooking)
+            if(stages.isCooking)
+                imageView3.setImageResource(R.drawable.ra_stage_fill)
         }
 
         override fun onItemSelected() {
@@ -59,6 +64,7 @@ class StageAdapter(
         override fun onItemEdit() {
             notifyItemChanged(adapterPosition)
         }
+
     }
 
     private val diffUtil = object: DiffUtil.ItemCallback<Stages>() {

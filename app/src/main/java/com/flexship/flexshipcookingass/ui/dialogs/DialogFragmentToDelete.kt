@@ -6,7 +6,10 @@ import androidx.fragment.app.DialogFragment
 import com.flexship.flexshipcookingass.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class DialogFragmentToDelete: DialogFragment() {
+class DialogFragmentToDelete(
+    private val title:Int,
+    private val message:Int
+): DialogFragment() {
 
     private var actionToDelete : (()->Unit) ?= null
 
@@ -16,12 +19,12 @@ class DialogFragmentToDelete: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return MaterialAlertDialogBuilder(requireContext())
-            .setMessage("")
-            .setTitle("")
-            .setPositiveButton(""){_ ,_ ->
+            .setMessage(message)
+            .setTitle(title)
+            .setPositiveButton(R.string.yes){_ ,_ ->
                 actionToDelete?.invoke()
             }
-            .setNegativeButton(""){dial, _ ->
+            .setNegativeButton(R.string.no){dial, _ ->
                 dial.dismiss()
 
             }

@@ -81,16 +81,26 @@ class CookingFragment : Fragment() {
                 stageList = it.stages
                 dish = it.dish
             }
-            stageAdapter.differ.submitList(stageList)
 
+
+            if(stageList.isEmpty()){
+                binding.recViewStage.isVisible=false
+                binding.layoutEmpty.isVisible=true
+                binding.fabNext.isVisible=false
+                binding.fabStop.isVisible=false
+                binding.fabPauseOrResume.isVisible=false
+                binding.textViewName.isVisible=false
+            }else if(stageList.size==1){
+                binding.fabNext.isVisible=false
+            }
             followToNewStage(args.posInList)
         }
-
 
         subscribeToObservers()
 
 
     }
+
 
     private fun subscribeToObservers() {
         CookService.timer.observe(viewLifecycleOwner) { time ->
@@ -161,27 +171,28 @@ class CookingFragment : Fragment() {
     }
 
     private fun followToNewStage(posInList: Int = -1) {
-        Log.d(LOG_ID, "Rabota = ${CookService.isWorking}")
         if (posInList != -1) {
             currentPos = posInList
         }
         try {
+            stageList[currentPos].isCooking=true
+            stageAdapter.differ.submitList(stageList)
             currentStage = stageAdapter.differ.currentList[currentPos++]
         } catch (ex: Exception) {
             ex.printStackTrace()
+        }
+        if(currentPos==stageList.size){
+            binding.fabNext.isVisible=false
         }
 
         binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
         binding.textViewFinisher.isVisible = false
         binding.textViewTimer.text = ""
 
-        Log.d(LOG_ID, "Zalupockika")
         if (CookService.isWorking && time <= 0L){
-            Log.d(LOG_ID, "Jopa")
             binding.textViewFinisher.isVisible = true
             binding.textViewTimer.text = "00:00"
         }
-        Log.d(LOG_ID, "Rabota2 = ${CookService.isWorking}")
 
     }
 
