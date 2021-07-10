@@ -44,7 +44,6 @@ class StageAdapter(
                 imageView4.visibility = View.GONE
             }
             stageName.text = stages.name
-            Log.d(LOG_ID,"Adapter"+stages.isCooking)
             if(stages.isCooking)
                 imageView3.setImageResource(R.drawable.ra_stage_fill)
         }

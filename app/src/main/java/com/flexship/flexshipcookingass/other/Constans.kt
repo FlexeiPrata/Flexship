@@ -14,9 +14,14 @@ object Constans {
     const val ACTION_PAUSE = "ACTION_PAUSE"
     const val ACTION_STOP = "ACTION_STOP"
 
+    //KEYS
     const val KEY_DISH_ID = "KEY_DISH_ID"
     const val KEY_TIME = "KEY_TIME"
     const val KEY_POSITION_IN_LIST="KEY_POSITION_IN_LIST"
+    const val KEY_BUF_LIST="KEY_BUF_LIST"
+    const val KEY_BITMAP="KEY_BITMAP"
+    const val KEY_TIME_SEC="KEY_TIME_SEC"
+    const val KEY_DISH="KEY_DISH"
 
 
     const val DELAY_FOR_TIMER = 1000L
