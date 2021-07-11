@@ -28,7 +28,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.flexship.flexshipcookingass.MainActivity
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.adapters.SpinnerAdapter
 import com.flexship.flexshipcookingass.adapters.StageAdapter
@@ -47,7 +46,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import pub.devrel.easypermissions.AppSettingsDialog
 import java.io.ByteArrayOutputStream
-import java.util.stream.Collectors.toList
 
 @AndroidEntryPoint
 class DishFragment : Fragment() {
@@ -67,10 +65,8 @@ class DishFragment : Fragment() {
 
     private var timeSec: Int = 0
     private var dishId: Int = -1
-    private var bufStageList: MutableList<Int> = mutableListOf()
 
-    private var lastID = 0
-
+    private var stageId: Int = -1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,8 +92,6 @@ class DishFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         timeSec = savedInstanceState?.getInt(Constans.KEY_MINUTE) ?: 0
-        bufStageList = savedInstanceState?.getIntArray(Constans.KEY_BUF_LIST)?.toMutableList()
-            ?: mutableListOf()
         bitmap = savedInstanceState?.getByteArray(Constans.KEY_BITMAP)?.let {
             BitmapFactory.decodeByteArray(it, 0, it.size)
         }
@@ -105,14 +99,14 @@ class DishFragment : Fragment() {
 
         setNotSavedValues()
 
-        viewModel.lastIDLiveData.observe(
-            viewLifecycleOwner,
-            {
-                it?.let {
-                    lastID = it
-                }
-            }
-        )
+//        viewModel.lastIDLiveData.observe(
+//            viewLifecycleOwner,
+//            {
+//                it?.let {
+//                    lastID = it
+//                }
+//            }
+//        )
 
         if (savedInstanceState != null) {
             dish = savedInstanceState.getSerializable(Constans.KEY_DISH) as Dish
@@ -130,8 +124,6 @@ class DishFragment : Fragment() {
                 parentFragmentManager.findFragmentByTag(Constans.TAG_DIALOG_DELETE) as DialogFragmentToDelete?
 
             dialogToDelete?.setAction {
-
-
                 findNavController().popBackStack()
             }
         }
@@ -147,24 +139,33 @@ class DishFragment : Fragment() {
             viewModel.isNewDish = false
             dishId = args.dishId
             viewModel.getDishById(dishId).observe(viewLifecycleOwner) { dishWithStages ->
-                    dish = dishWithStages.dish
+
+                if (!viewModel.isUpdated) {
+                    if (!viewModel.isChangedConfig) {
+                        dish = dishWithStages.dish
+                        setValues()
+                    }
                     setupToolbar(String.format(getString(R.string.dish_title), dish.name))
-                    setValues()
+                    viewModel.isUpdated = true
+
+                }
                 viewModel._stageList.postValue(dishWithStages.stages.toMutableList())
             }
             binding.bInsertDish.text = "Обновить"
         } else {
-            if (!viewModel.isInserted) {
-                dish = Dish()
-                viewModel.insertDish(dish)
-                viewModel.isInserted = true
-            }
+            dish = Dish()
             setupToolbar("Новое блюдо")
-            viewModel.getNewDish().observe(viewLifecycleOwner) {
+            viewModel.getMaxIdDish().observe(viewLifecycleOwner) {
                 dishId = 1
                 it?.let {
-                    dishId = it
+                    dishId = it + 1
                 }
+            }
+        }
+        viewModel.getMaxIdStage.observe(viewLifecycleOwner) {
+            stageId = 1
+            it?.let {
+                stageId = it + 1
             }
         }
         viewModel.stageList.observe(viewLifecycleOwner) {
@@ -187,7 +188,8 @@ class DishFragment : Fragment() {
                 if (stageName.isNotEmpty()) {
                     submitNewStage(stageName)
                 } else {
-                    Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT)
+                        .show()
                 }
             }
         }
@@ -206,26 +208,11 @@ class DishFragment : Fragment() {
         super.onStop()
 
         if (!requireActivity().isChangingConfigurations) {
-            /*if (!viewModel.isSaved && viewModel.isNewDish) {
-                dish.id = dishId
-                if (viewModel.stageList.value?.size ?: 0 > 0) {
-                    viewModel.deleteDish(dish, true)
-                } else {
-                    viewModel.deleteDish(dish)
-                }
-
-            } else if (!viewModel.isNewDish && bufStageList.isNotEmpty() && !viewModel.isSaved) {
-
-                viewModel.deleteNotSavedStages(bufStageList)
-            }
-        } else {
-            viewModel.isChangedConfig = true*/
-
             for (i in viewModel.bufferStageList)
                 viewModel.deleteStage(i)
-
-
-
+        } else {
+            viewModel.isChangedConfig = true
+            viewModel.isUpdated = false
         }
 
     }
@@ -239,29 +226,10 @@ class DishFragment : Fragment() {
         }
     }
 
-    private fun setupToolbar(titleT: String) {
-        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
-            title = titleT
-            setNavigationIcon(R.drawable.ic_back)
-            setNavigationOnClickListener {
-                    checkFieldsForUpdateIfNotSaved()
-            }
-        }
-    }
 
+    private fun
+            setValues() = with(binding) {
 
-
-
-    private fun setTimeToButton(timeSec: Int) {
-        binding.bTime.text = String.format(
-            getString(R.string.timer),
-            zeroOrNotZero(timeSec / 60),
-            zeroOrNotZero(timeSec % 60)
-        )
-    }
-
-
-    private fun setValues() = with(binding) {
         bitmap = dish.image
         edName.setText(dish.name)
         edReceipt.setText(dish.recipe)
@@ -270,61 +238,37 @@ class DishFragment : Fragment() {
         else
             mainImage.setImageResource(R.drawable.empty)
         spinnerCategory.setSelection(dish.category)
-        viewModel.isUpdated = true
-    }
 
+    }
 
 
     private fun submitNewStage(stageName: String) {
         val stage = Stages(name = stageName, time = timeSec.toLong(), dishId = dishId)
 
-        viewModel.apply {
-            insertStage(stage)
-
-            stage.apply {
-                id = lastID + 1
-                bufferStageList.add(this)
+        viewModel.insertStage(stage)
+        stage.id = stageId
+        viewModel.bufferStageList.add(stage)
+        if (viewModel.isNewDish) {
+            viewModel._stageList.value?.apply {
+                add(stage)
+                viewModel._stageList.postValue(this)
             }
-
         }
-
         timeSec = 0
         binding.edStages.setText("")
         binding.bTime.setText(R.string.dish_choose_time)
     }
 
-    private fun checkFieldsToAddNewDishOrUpdate() = with(binding) {
-        val name = edName.text.toString()
-        val desc = edReceipt.text.toString()
-        if (name.isEmpty() && desc.isEmpty())
-            Snackbar.make(requireView(), "Введите имя и рецепт блюда", Snackbar.LENGTH_SHORT).show()
-        else if (bitmap == null)
-            alertDialog(
-                "Изображение блюда",
-                "Вы не выбрали изображение для блюда.Вы действительно хотите продолжить без изображения блюда?",
-                true
-            )
-        else if (viewModel.stageList.value?.size ?: 0 == 0)
-            alertDialog(
-                "Этапы готовки",
-                "У вас отсутствуют этапы готовки.Вы действительно хотите продолжить без этапов готовки?",
-                true
-            )
-        else if (name.isEmpty())
-            Snackbar.make(requireView(), "Введите имя  блюда", Snackbar.LENGTH_SHORT).show()
-        else if (desc.isEmpty())
-            Snackbar.make(requireView(), "Введите рецепт блюда", Snackbar.LENGTH_SHORT).show()
-        else {
-            updateDish(name, desc)
-        }
-    }
 
     private fun updateDish(name: String, desc: String) = with(binding) {
         val spinnerPos = spinnerCategory.selectedItemPosition
         val dish = Dish(dishId, name, desc, spinnerPos, bitmap)
         this@DishFragment.dish = dish
-        viewModel.updateDish(dish)
-        //viewModel.isSaved = true
+        if (viewModel.isNewDish) {
+            viewModel.insertDish(dish)
+        } else {
+            viewModel.updateDish(dish)
+        }
         viewModel.bufferStageList.clear()
         findNavController().popBackStack()
 
@@ -349,15 +293,36 @@ class DishFragment : Fragment() {
         }
     }
 
-    private fun showDialogToDelete() = DialogFragmentToDelete.newInstance(getString(R.string.dialog_del_mes),
+    private fun showDialogToDelete() = DialogFragmentToDelete.newInstance(
+        getString(R.string.dialog_del_mes),
         getString(R.string.dialog_del_title)
     ).apply {
         setAction {
-            /*for (i in viewModel.bufferStageList)
-                viewModel.deleteStage(i)*/
             findNavController().popBackStack()
         }
     }.show(parentFragmentManager, Constans.TAG_DIALOG_DELETE)
+
+
+    //ЭТО не ТРОГАТЬ
+
+    private fun setupToolbar(titleT: String) {
+        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
+            title = titleT
+            setNavigationIcon(R.drawable.ic_back)
+            setNavigationOnClickListener {
+                checkFieldsForUpdateIfNotSaved()
+            }
+        }
+    }
+
+
+    private fun setTimeToButton(timeSec: Int) {
+        binding.bTime.text = String.format(
+            getString(R.string.timer),
+            zeroOrNotZero(timeSec / 60),
+            zeroOrNotZero(timeSec % 60)
+        )
+    }
 
     private fun setupUI() {
 
@@ -383,18 +348,41 @@ class DishFragment : Fragment() {
                 }
 
                 override fun itemDelete(pos: Int) {
-                    val stage=viewModel.stageList.value?.get(pos)!!
+                    viewModel.isBuffer = false
+                    val stage = viewModel.stageList.value?.get(pos)!!
                     viewModel.deleteStage(stage)
-                    viewModel._stageList.value?.apply{
-                        removeAt(pos)
-                        viewModel._stageList.postValue(this)
+                    var stageToDelete: Stages?=null
+                    for (buf in viewModel.bufferStageList) {
+
+                        if (stage == buf) {
+                            stageToDelete=stage
+                            viewModel.isBuffer = true
+                        }
                     }
-                    Snackbar.make(requireView(),"Стадия была успешно удалена!",Snackbar.LENGTH_LONG)
-                        .setAction("Вернуть"){
+                    stageToDelete?.let {
+                        viewModel.bufferStageList.remove(it)
+                    }
+                    if (viewModel.isNewDish) {
+                        viewModel._stageList.value?.apply {
+                            removeAt(pos)
+                            viewModel._stageList.postValue(this)
+                        }
+                    }
+                    Snackbar.make(
+                        requireView(),
+                        "Стадия была успешно удалена!",
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAction("Вернуть") {
                             viewModel.insertStage(stage)
-                            viewModel._stageList.value?.apply {
-                                add(pos,stage)
-                                viewModel._stageList.postValue(this)
+                            if (viewModel.isBuffer) {
+                                viewModel.bufferStageList.add(stage)
+                            }
+                            if (viewModel.isNewDish) {
+                                viewModel._stageList.value?.apply {
+                                    add(pos, stage)
+                                    viewModel._stageList.postValue(this)
+                                }
                             }
                         }
                         .show()
@@ -423,8 +411,32 @@ class DishFragment : Fragment() {
         }
     }
 
+    private fun checkFieldsToAddNewDishOrUpdate() = with(binding) {
+        val name = edName.text.toString()
+        val desc = edReceipt.text.toString()
+        if (name.isEmpty() && desc.isEmpty())
+            Snackbar.make(requireView(), "Введите имя и рецепт блюда", Snackbar.LENGTH_SHORT).show()
+        else if (bitmap == null)
+            alertDialog(
+                "Изображение блюда",
+                "Вы не выбрали изображение для блюда.Вы действительно хотите продолжить без изображения блюда?",
+                true
+            )
+        else if (viewModel.stageList.value?.size ?: 0 == 0)
+            alertDialog(
+                "Этапы готовки",
+                "У вас отсутствуют этапы готовки.Вы действительно хотите продолжить без этапов готовки?",
+                true
+            )
+        else if (name.isEmpty())
+            Snackbar.make(requireView(), "Введите имя  блюда", Snackbar.LENGTH_SHORT).show()
+        else if (desc.isEmpty())
+            Snackbar.make(requireView(), "Введите рецепт блюда", Snackbar.LENGTH_SHORT).show()
+        else {
+            updateDish(name, desc)
+        }
+    }
 
-    //ЭТО не ТРОГАТЬ
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.forEach { permission ->

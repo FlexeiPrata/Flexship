@@ -26,6 +26,7 @@ class DishViewModel @Inject constructor(
     var isInserted: Boolean = false
     var isChangedConfig: Boolean = false
     var isStageEdit = false
+    var isBuffer = false
 
     val lastIDLiveData = cookRepository.getMaxIdOfStage().asLiveData()
 
@@ -55,7 +56,7 @@ class DishViewModel @Inject constructor(
 
     fun getDishById(dishId: Int) = cookRepository.getDishWithStages(dishId).asLiveData()
 
-    fun getNewDish() = cookRepository.getNewDish().asLiveData()
+    fun getMaxIdDish() = cookRepository.getMaxIdDish().asLiveData()
 
     fun updateDish(dish: Dish, stages: List<Stages> = listOf(), updateStage: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -80,6 +81,7 @@ class DishViewModel @Inject constructor(
     fun deleteNotSavedStages(ids: List<Int>) = viewModelScope.launch(Dispatchers.IO) {
         cookRepository.deleteNotSavedStages(ids)
     }
+    val getMaxIdStage = cookRepository.getMaxIdOfStage().asLiveData()
 
 
 }
