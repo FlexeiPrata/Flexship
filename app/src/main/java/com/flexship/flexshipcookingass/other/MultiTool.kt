@@ -19,6 +19,8 @@ const val DISH_ID_SAFE_ARG = "dishId"
 const val MINUTES = "MINUTES"
 const val CATEGORY_ID = "categoryId"
 const val LOG_ID = "MyLog"
+const val TITLE = "Title"
+const val MESSAGE = "Message"
 
 fun expandAction(view: View, height: Int) {
     view.measure(ViewGroup.LayoutParams.MATCH_PARENT, height)
