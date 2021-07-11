@@ -18,16 +18,12 @@ class DishViewModel @Inject constructor(
     //val stageList: LiveData<MutableList<Stages>> = _stageList
     val stageList get() = _stageList as LiveData<MutableList<Stages>>
 
-    val bufferStageList = mutableListOf<Stages>()
-
     var isUpdated = false
     var isSaved = false
     var isNewDish: Boolean = true
     var isInserted: Boolean = false
     var isChangedConfig: Boolean = false
-    var isStageEdit = false
-
-    val lastIDLiveData = cookRepository.getMaxIdOfStage().asLiveData()
+    var isDeleted: Boolean = false
 
     fun postEmptyValues() {
         _stageList.postValue(mutableListOf())
@@ -81,5 +77,5 @@ class DishViewModel @Inject constructor(
         cookRepository.deleteNotSavedStages(ids)
     }
 
-
+    val maxIdOfStage = cookRepository.getMaxIdOfStage().asLiveData()
 }

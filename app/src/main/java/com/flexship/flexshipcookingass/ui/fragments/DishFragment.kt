@@ -18,7 +18,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -28,7 +27,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.flexship.flexshipcookingass.MainActivity
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.adapters.SpinnerAdapter
 import com.flexship.flexshipcookingass.adapters.StageAdapter
@@ -69,18 +67,6 @@ class DishFragment : Fragment() {
     private var dishId: Int = -1
     private var bufStageList: MutableList<Int> = mutableListOf()
 
-    private var lastID = 0
-
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            checkFieldsForUpdateIfNotSaved()
-        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -105,15 +91,6 @@ class DishFragment : Fragment() {
 
         setNotSavedValues()
 
-        viewModel.lastIDLiveData.observe(
-            viewLifecycleOwner,
-            {
-                it?.let {
-                    lastID = it
-                }
-            }
-        )
-
         if (savedInstanceState != null) {
             dish = savedInstanceState.getSerializable(Constans.KEY_DISH) as Dish
 
@@ -130,8 +107,9 @@ class DishFragment : Fragment() {
                 parentFragmentManager.findFragmentByTag(Constans.TAG_DIALOG_DELETE) as DialogFragmentToDelete?
 
             dialogToDelete?.setAction {
-
-
+                if (bufStageList.isNotEmpty()) {
+                    viewModel.deleteNotSavedStages(bufStageList)
+                }
                 findNavController().popBackStack()
             }
         }
@@ -147,10 +125,13 @@ class DishFragment : Fragment() {
             viewModel.isNewDish = false
             dishId = args.dishId
             viewModel.getDishById(dishId).observe(viewLifecycleOwner) { dishWithStages ->
+                if (!viewModel.isUpdated) {
                     dish = dishWithStages.dish
-                    setupToolbar(String.format(getString(R.string.dish_title), dish.name))
+                    setupToolbar("Блюдо:".plus(dish.name))
                     setValues()
+                }
                 viewModel._stageList.postValue(dishWithStages.stages.toMutableList())
+
             }
             binding.bInsertDish.text = "Обновить"
         } else {
@@ -182,14 +163,7 @@ class DishFragment : Fragment() {
         }
 
         bAddStage.setOnClickListener {
-            binding.apply {
-                val stageName = edStages.text.toString()
-                if (stageName.isNotEmpty()) {
-                    submitNewStage(stageName)
-                } else {
-                    Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT).show()
-                }
-            }
+            checkFieldsForAddStage()
         }
 
         bInsertDish.setOnClickListener {
@@ -206,28 +180,20 @@ class DishFragment : Fragment() {
         super.onStop()
 
         if (!requireActivity().isChangingConfigurations) {
-            /*if (!viewModel.isSaved && viewModel.isNewDish) {
+            if (!viewModel.isSaved && viewModel.isNewDish) {
                 dish.id = dishId
                 if (viewModel.stageList.value?.size ?: 0 > 0) {
                     viewModel.deleteDish(dish, true)
                 } else {
                     viewModel.deleteDish(dish)
                 }
-
             } else if (!viewModel.isNewDish && bufStageList.isNotEmpty() && !viewModel.isSaved) {
 
                 viewModel.deleteNotSavedStages(bufStageList)
             }
         } else {
-            viewModel.isChangedConfig = true*/
-
-            for (i in viewModel.bufferStageList)
-                viewModel.deleteStage(i)
-
-
-
+            viewModel.isChangedConfig = true
         }
-
     }
 
     private fun setNotSavedValues() {
@@ -244,12 +210,14 @@ class DishFragment : Fragment() {
             title = titleT
             setNavigationIcon(R.drawable.ic_back)
             setNavigationOnClickListener {
+                if (!viewModel.isNewDish) {
                     checkFieldsForUpdateIfNotSaved()
+                } else {
+                    findNavController().popBackStack()
+                }
             }
         }
     }
-
-
 
 
     private fun setTimeToButton(timeSec: Int) {
@@ -274,20 +242,28 @@ class DishFragment : Fragment() {
     }
 
 
+    private fun checkFieldsForAddStage() {
+        binding.apply {
+            val stageName = edStages.text.toString()
+            if (stageName.isNotEmpty()) {
+                submitNewStage(stageName)
+            } else {
+                Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     private fun submitNewStage(stageName: String) {
         val stage = Stages(name = stageName, time = timeSec.toLong(), dishId = dishId)
-
-        viewModel.apply {
-            insertStage(stage)
-
-            stage.apply {
-                id = lastID + 1
-                bufferStageList.add(this)
+        viewModel.insertStage(stage)
+        if (viewModel.isNewDish) {
+            viewModel._stageList.value?.apply {
+                add(stage)
+                viewModel._stageList.postValue(this)
             }
-
+        } else {
+            bufStageList.add(stage.id)
         }
-
         timeSec = 0
         binding.edStages.setText("")
         binding.bTime.setText(R.string.dish_choose_time)
@@ -323,9 +299,9 @@ class DishFragment : Fragment() {
         val spinnerPos = spinnerCategory.selectedItemPosition
         val dish = Dish(dishId, name, desc, spinnerPos, bitmap)
         this@DishFragment.dish = dish
+
         viewModel.updateDish(dish)
-        //viewModel.isSaved = true
-        viewModel.bufferStageList.clear()
+        viewModel.isSaved = true
         findNavController().popBackStack()
 
     }
@@ -342,19 +318,24 @@ class DishFragment : Fragment() {
     private fun checkFieldsForUpdateIfNotSaved() = with(binding) {
         val name = edName.text.toString()
         val receipt = edReceipt.text.toString()
-        if (name != dish.name || receipt != dish.recipe || viewModel.bufferStageList.isNotEmpty()) {
+        if (name != dish.name || receipt != dish.recipe || bufStageList.isNotEmpty()) {
+            for(id in bufStageList){
+                Log.d(LOG_ID,"ID:"+id)
+            }
             showDialogToDelete()
         } else {
             findNavController().popBackStack()
         }
     }
 
-    private fun showDialogToDelete() = DialogFragmentToDelete.newInstance(getString(R.string.dialog_del_mes),
-        getString(R.string.dialog_del_title)
+    private fun showDialogToDelete() = DialogFragmentToDelete(
+        R.string.dialog_del_title,
+        R.string.dialog_del_mes
     ).apply {
         setAction {
-            /*for (i in viewModel.bufferStageList)
-                viewModel.deleteStage(i)*/
+            if (bufStageList.isNotEmpty()) {
+                viewModel.deleteNotSavedStages(bufStageList)
+            }
             findNavController().popBackStack()
         }
     }.show(parentFragmentManager, Constans.TAG_DIALOG_DELETE)
@@ -378,8 +359,7 @@ class DishFragment : Fragment() {
                 }
 
                 override fun itemEdit(pos: Int) {
-                    viewModel.isStageEdit = true
-
+                    //лень
                 }
 
                 override fun itemDelete(pos: Int) {
@@ -610,7 +590,7 @@ class DishFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt(Constans.KEY_MINUTE, timeSec)
-        //outState.putIntArray(Constans.KEY_BUF_LIST, bufStageList.toIntArray())
+        outState.putIntArray(Constans.KEY_BUF_LIST, bufStageList.toIntArray())
         bitmap?.let {
             val out = ByteArrayOutputStream()
             it.compress(Bitmap.CompressFormat.JPEG, 30, out)
