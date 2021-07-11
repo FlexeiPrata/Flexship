@@ -15,13 +15,15 @@ class DishViewModel @Inject constructor(
 ) : ViewModel() {
 
     val _stageList = MutableLiveData<MutableList<Stages>>()
-    val stageList: LiveData<MutableList<Stages>> = _stageList
+    //val stageList: LiveData<MutableList<Stages>> = _stageList
+    val stageList get() = _stageList as LiveData<MutableList<Stages>>
 
     var isUpdated = false
     var isSaved = false
     var isNewDish: Boolean = true
     var isInserted: Boolean = false
     var isChangedConfig: Boolean = false
+    var isDeleted: Boolean = false
 
     fun postEmptyValues() {
         _stageList.postValue(mutableListOf())

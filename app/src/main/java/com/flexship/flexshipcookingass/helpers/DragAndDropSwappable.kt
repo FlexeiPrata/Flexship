@@ -12,11 +12,16 @@ import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.other.convertDpToPx
 import com.flexship.flexshipcookingass.other.drawableToBitmap
 
-abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT) {
+abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHelper.SimpleCallback(
+    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+    ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
+) {
     //Целевой ViewHolder должен реализовывать интерфейс DragAndDropSwappable.ItemDragDropMoveViewHolder
 
-    private val iconDelete = drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.ra_delete)!!)!!
-    private val iconEdit = drawableToBitmap(AppCompatResources.getDrawable(context, R.drawable.ra_edit)!!)!!
+    private val iconDelete =
+        drawableToBitmap(ContextCompat.getDrawable(context, R.drawable.ra_delete)!!)!!
+    private val iconEdit =
+        drawableToBitmap(AppCompatResources.getDrawable(context, R.drawable.ra_edit)!!)!!
 
     private val pDelete = Paint().apply {
         color = ContextCompat.getColor(context, R.color.red)
@@ -75,7 +80,15 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive) //передвижение элемента
+        super.onChildDraw(
+            c,
+            recyclerView,
+            viewHolder,
+            dX,
+            dY,
+            actionState,
+            isCurrentlyActive
+        ) //передвижение элемента
 
         val itemView: View = viewHolder.itemView
 
@@ -87,7 +100,7 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
             c.drawBitmap(
                 iconDelete,
                 itemView.left.toFloat() + convertDpToPx(context, 12),
-                itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat()- iconDelete.height) / 2,
+                itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - iconDelete.height) / 2,
                 pDelete
             )
         } else if (dX < 0) {
@@ -97,13 +110,12 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
             )
             c.drawBitmap(
                 iconEdit,
-                itemView.right.toFloat() - convertDpToPx(context,12) - iconEdit.width,
-                itemView.top.toFloat() + (itemView.bottom.toFloat()- itemView.top.toFloat() - iconEdit.height) / 2,
+                itemView.right.toFloat() - convertDpToPx(context, 12) - iconEdit.width,
+                itemView.top.toFloat() + (itemView.bottom.toFloat() - itemView.top.toFloat() - iconEdit.height) / 2,
                 pEdit
             )
         }
     }
-
 
 
     //изменение представляемого списка каждый раз, когда элемент меняет позицию

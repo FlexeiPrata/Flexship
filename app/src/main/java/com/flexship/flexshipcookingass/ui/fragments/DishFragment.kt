@@ -133,13 +133,6 @@ class DishFragment : Fragment() {
                 viewModel._stageList.postValue(dishWithStages.stages.toMutableList())
 
             }
-            viewModel.maxIdOfStage.observe(viewLifecycleOwner) { maxId ->
-                maxId?.let {
-                    if (viewModel.isUpdated) {
-                        bufStageList.add(it)
-                    }
-                }
-            }
             binding.bInsertDish.text = "Обновить"
         } else {
             if (!viewModel.isInserted) {
@@ -186,7 +179,7 @@ class DishFragment : Fragment() {
     override fun onStop() {
         super.onStop()
 
-        if (!activity?.isChangingConfigurations!!) {
+        if (!requireActivity().isChangingConfigurations) {
             if (!viewModel.isSaved && viewModel.isNewDish) {
                 dish.id = dishId
                 if (viewModel.stageList.value?.size ?: 0 > 0) {
@@ -195,9 +188,9 @@ class DishFragment : Fragment() {
                     viewModel.deleteDish(dish)
                 }
             } else if (!viewModel.isNewDish && bufStageList.isNotEmpty() && !viewModel.isSaved) {
+
                 viewModel.deleteNotSavedStages(bufStageList)
             }
-            Log.d(LOG_ID, "NAH")
         } else {
             viewModel.isChangedConfig = true
         }
@@ -326,6 +319,9 @@ class DishFragment : Fragment() {
         val name = edName.text.toString()
         val receipt = edReceipt.text.toString()
         if (name != dish.name || receipt != dish.recipe || bufStageList.isNotEmpty()) {
+            for(id in bufStageList){
+                Log.d(LOG_ID,"ID:"+id)
+            }
             showDialogToDelete()
         } else {
             findNavController().popBackStack()
@@ -367,6 +363,21 @@ class DishFragment : Fragment() {
                 }
 
                 override fun itemDelete(pos: Int) {
+                    val stage=viewModel.stageList.value?.get(pos)!!
+                    viewModel.deleteStage(stage)
+                    viewModel._stageList.value?.apply{
+                        removeAt(pos)
+                        viewModel._stageList.postValue(this)
+                    }
+                    Snackbar.make(requireView(),"Стадия была успешно удалена!",Snackbar.LENGTH_LONG)
+                        .setAction("Вернуть"){
+                            viewModel.insertStage(stage)
+                            viewModel._stageList.value?.apply {
+                                add(pos,stage)
+                                viewModel._stageList.postValue(this)
+                            }
+                        }
+                        .show()
 
                 }
 
