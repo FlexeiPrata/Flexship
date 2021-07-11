@@ -1,5 +1,6 @@
 package com.flexship.flexshipcookingass
 
+import androidx.lifecycle.asLiveData
 import com.flexship.flexshipcookingass.db.CookDao
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
@@ -41,5 +42,6 @@ class CookRepository @Inject constructor(
     suspend fun deleteNotSavedStages(ids: List<Int>) = cookDao.deleteNotSavedStages(ids)
 
     fun getMaxIdOfStage() = cookDao.getMaxIdOfStage()
+
 
 }

@@ -159,7 +159,8 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
     }
 
     private fun callDialogToDelete(dish: Dish) {
-        DialogFragmentToDelete(R.string.dialog_del_dish_title,R.string.dialog_del_dish_mes).apply {
+        //ПОМЕНЯТЬ!!!!!!!!!
+        DialogFragmentToDelete().apply {
             setAction {
                 viewModel.deleteDish(dish)
                 Snackbar.make(requireView(), "Dish was successfully deleted!", Snackbar.LENGTH_LONG)

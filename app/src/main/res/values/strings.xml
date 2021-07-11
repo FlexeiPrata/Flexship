@@ -26,4 +26,5 @@
     <string name="dialog_del_mes">У вас присутствуют не сохраненные данные.Все несохраненные данные будут утерены.Желаете продолжить?</string>
     <string name="dialog_del_dish_title">Удаление блюда</string>
     <string name="dialog_del_dish_mes">Вы действительно хотите удалить данное блюдо?</string>
+    <string name="dish_title">Блюдо: %s</string>
 </resources>
