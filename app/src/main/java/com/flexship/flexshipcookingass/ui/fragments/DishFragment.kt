@@ -44,7 +44,6 @@ import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_dish.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import java.io.ByteArrayOutputStream
 
@@ -68,6 +67,7 @@ class DishFragment : Fragment() {
     private var dishId: Int = -1
 
     private var stageId: Int = -1
+    private var pos = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -150,7 +150,6 @@ class DishFragment : Fragment() {
                     viewModel.isUpdated = true
 
                 }
-                Log.d(LOG_ID,"SIZE:${dishWithStages.stages.last()}")
                 viewModel._stageList.postValue(dishWithStages.stages.toMutableList())
             }
             binding.bInsertDish.text = "Обновить"
@@ -171,10 +170,7 @@ class DishFragment : Fragment() {
             }
         }
         viewModel.stageList.observe(viewLifecycleOwner) {
-            if(it.isNotEmpty()){
-                Log.d(LOG_ID,"SIZEHUI:${it.last()}")
-            }
-            stageAdapter.differ.submitList(it.toList())
+            stageAdapter.submitList(it)
         }
 
 
@@ -191,9 +187,9 @@ class DishFragment : Fragment() {
             val stageName = edStages.text.toString()
 
             if (stageName.isNotEmpty()) {
-                if(!viewModel.isStageEdit){
+                if (!viewModel.isStageEdit) {
                     submitNewStage(stageName)
-                }else{
+                } else {
                     updateStage(stageName)
                 }
             } else {
@@ -224,25 +220,26 @@ class DishFragment : Fragment() {
         }
 
     }
-    private fun updateStage(stageName: String){
-        viewModel.stageToEdit?.let{
-            it.name=stageName
-            Log.d(LOG_ID,"NAME:${viewModel.stageToEdit?.name}")
-            it.time=timeSec.toLong()
+
+    private fun updateStage(stageName: String) {
+        viewModel.stageToEdit?.let {
+            it.name = stageName
+            Log.d(LOG_ID, "NAME:${viewModel.stageToEdit?.name}")
+            it.time = timeSec.toLong()
             viewModel.updateStage(it)
-            if(viewModel.isNewDish){
+            if (viewModel.isNewDish) {
                 viewModel._stageList.value?.apply {
-                    set(viewModel.posToEdit,it)
-                    Log.d(LOG_ID,"NAME1:${it}")
+                    set(viewModel.posToEdit, it)
+                    Log.d(LOG_ID, "NAME1:${it}")
                     viewModel._stageList.postValue(this)
                 }
             }
         }
-        viewModel.isStageEdit=false
+        viewModel.isStageEdit = false
         binding.edStages.setText("")
-        timeSec=0
-        binding.bTime.text="Указать время"
-        binding.bAddStage.text="Добавить"
+        timeSec = 0
+        binding.bTime.text = "Указать время"
+        binding.bAddStage.text = "Добавить"
     }
 
     private fun setNotSavedValues() {
@@ -252,8 +249,8 @@ class DishFragment : Fragment() {
         if (timeSec != 0) {
             setTimeToButton(timeSec)
         }
-        if(viewModel.isStageEdit){
-            b_add_stage.text="Обновить стадию"
+        if (viewModel.isStageEdit) {
+            binding.bAddStage.text = "Обновить стадию"
         }
     }
 
@@ -374,25 +371,28 @@ class DishFragment : Fragment() {
                 }
 
                 override fun itemEdit(pos: Int) {
-                    viewModel.posToEdit=pos
+                    this@DishFragment.pos = pos
+                    binding.recViewStages.adapter?.notifyItemChanged(pos)
+                    viewModel.posToEdit = pos
                     viewModel.isStageEdit = true
-                    val stage= viewModel.stageList.value?.get(pos)!!
-                    viewModel.stageToEdit=stage
-                    ed_stages.setText(stage.name)
-                    timeSec=stage.time.toInt()
+                    val testList = viewModel.stageList.value?.toList() ?: listOf()
+                    val stage = testList[pos].copy()
+                    viewModel.stageToEdit = stage
+                    binding.edStages.setText(stage.name)
+                    timeSec = stage.time.toInt()
                     setTimeToButton(timeSec)
-                    b_add_stage.text="Обновить стадию"
+                    binding.bAddStage.text = "Обновить стадию"
                 }
 
                 override fun itemDelete(pos: Int) {
                     viewModel.isBuffer = false
                     val stage = viewModel.stageList.value?.get(pos)!!
                     viewModel.deleteStage(stage)
-                    var stageToDelete: Stages?=null
+                    var stageToDelete: Stages? = null
                     for (buf in viewModel.bufferStageList) {
 
                         if (stage == buf) {
-                            stageToDelete=stage
+                            stageToDelete = stage
                             viewModel.isBuffer = true
                         }
                     }

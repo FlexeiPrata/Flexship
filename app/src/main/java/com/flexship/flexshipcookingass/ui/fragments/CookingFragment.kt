@@ -176,8 +176,8 @@ class CookingFragment : Fragment() {
         }
         try {
             stageList[currentPos].isCooking=true
-            stageAdapter.differ.submitList(stageList)
-            currentStage = stageAdapter.differ.currentList[currentPos++]
+            //stageAdapter.submitList(stageList)
+            currentStage = stageAdapter.items[currentPos++]
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
