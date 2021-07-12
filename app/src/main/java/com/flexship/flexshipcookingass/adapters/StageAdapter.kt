@@ -20,7 +20,6 @@ class StageAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<StageAdapter.ViewHolderData>() {
 
-    var items = mutableListOf<Stages>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolderData {
         val view = LayoutInflater.from(context).inflate(R.layout.stage_adapter, parent, false)
@@ -28,11 +27,11 @@ class StageAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolderData, position: Int) {
-        holder.setData(items[position])
+        holder.setData(differ.currentList[position])
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return differ.currentList.size
     }
 
     inner class ViewHolderData(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -70,55 +69,52 @@ class StageAdapter(
         }
 
         override fun onItemEdit() {
-            //notifyItemChanged(adapterPosition)
+            notifyItemChanged(adapterPosition)
         }
 
     }
 
 
-   /* private val diffUtil = object : DiffUtil.ItemCallback<Stages>() {
+  private val diffUtil = object : DiffUtil.ItemCallback<Stages>() {
         override fun areItemsTheSame(oldItem: Stages, newItem: Stages): Boolean = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: Stages, newItem: Stages): Boolean = oldItem == newItem
     }
-    val differ = AsyncListDiffer(this, diffUtil)*/
+    val differ = AsyncListDiffer(this, diffUtil)
 
-   inner class StageItemDiffCallback(
-        var oldList: List<Stages>,
-        var newList: List<Stages>
-    ) : DiffUtil.Callback() {
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
-
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].id == newList[newItemPosition].id
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition] == newList[newItemPosition]
-        }
-
-    }
-
-    fun submitList(stageList: List<Stages>) {
-        val oldList = ArrayList(items)
-        /*Log.d(LOG_ID, "OLD LIST: ")
-        for (i in oldList) Log.d(LOG_ID, "$i")
-        Log.d(LOG_ID, "NEW LIST: ")
-        for (i in stageList) Log.d(LOG_ID, "$i")*/
-        val diffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(
-            StageItemDiffCallback(oldList, stageList)
-        )
-        items = stageList.toMutableList()
-        diffResult.dispatchUpdatesTo(this)
-
-
-
-    }
+//   inner class StageItemDiffCallback(
+//        var oldList: List<Stages>,
+//        var newList: List<Stages>
+//    ) : DiffUtil.Callback() {
+//        override fun getOldListSize(): Int {
+//            return oldList.size
+//        }
+//
+//        override fun getNewListSize(): Int {
+//            return newList.size
+//        }
+//
+//        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//            return oldList[oldItemPosition].id == newList[newItemPosition].id
+//        }
+//
+//        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//            return oldList[oldItemPosition] == newList[newItemPosition]
+//        }
+//
+//    }
+//
+//    fun submitList(stageList: List<Stages>) {
+//        val oldList = ArrayList(items)
+//
+//        val diffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(
+//            StageItemDiffCallback(oldList, stageList)
+//        )
+//        items = stageList.toMutableList()
+//        diffResult.dispatchUpdatesTo(this)
+//
+//
+//
+//    }
 
 
 }
