@@ -44,6 +44,7 @@ import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_dish.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import java.io.ByteArrayOutputStream
 
@@ -149,6 +150,7 @@ class DishFragment : Fragment() {
                     viewModel.isUpdated = true
 
                 }
+                Log.d(LOG_ID,"SIZE:${dishWithStages.stages.last()}")
                 viewModel._stageList.postValue(dishWithStages.stages.toMutableList())
             }
             binding.bInsertDish.text = "Обновить"
@@ -169,6 +171,9 @@ class DishFragment : Fragment() {
             }
         }
         viewModel.stageList.observe(viewLifecycleOwner) {
+            if(it.isNotEmpty()){
+                Log.d(LOG_ID,"SIZEHUI:${it.last()}")
+            }
             stageAdapter.differ.submitList(it.toList())
         }
 
@@ -183,14 +188,17 @@ class DishFragment : Fragment() {
         }
 
         bAddStage.setOnClickListener {
-            binding.apply {
-                val stageName = edStages.text.toString()
-                if (stageName.isNotEmpty()) {
+            val stageName = edStages.text.toString()
+
+            if (stageName.isNotEmpty()) {
+                if(!viewModel.isStageEdit){
                     submitNewStage(stageName)
-                } else {
-                    Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT)
-                        .show()
+                }else{
+                    updateStage(stageName)
                 }
+            } else {
+                Snackbar.make(requireView(), "Введите название этапа", Snackbar.LENGTH_SHORT)
+                    .show()
             }
         }
 
@@ -215,6 +223,26 @@ class DishFragment : Fragment() {
             viewModel.isUpdated = false
         }
 
+    }
+    private fun updateStage(stageName: String){
+        viewModel.stageToEdit?.let{
+            it.name=stageName
+            Log.d(LOG_ID,"NAME:${viewModel.stageToEdit?.name}")
+            it.time=timeSec.toLong()
+            viewModel.updateStage(it)
+            if(viewModel.isNewDish){
+                viewModel._stageList.value?.apply {
+                    set(viewModel.posToEdit,it)
+                    Log.d(LOG_ID,"NAME1:${it}")
+                    viewModel._stageList.postValue(this)
+                }
+            }
+        }
+        viewModel.isStageEdit=false
+        binding.edStages.setText("")
+        timeSec=0
+        binding.bTime.text="Указать время"
+        binding.bAddStage.text="Добавить"
     }
 
     private fun setNotSavedValues() {
@@ -343,8 +371,14 @@ class DishFragment : Fragment() {
                 }
 
                 override fun itemEdit(pos: Int) {
+                    viewModel.posToEdit=pos
                     viewModel.isStageEdit = true
-
+                    val stage= viewModel.stageList.value?.get(pos)!!
+                    viewModel.stageToEdit=stage
+                    ed_stages.setText(stage.name)
+                    timeSec=stage.time.toInt()
+                    setTimeToButton(timeSec)
+                    b_add_stage.text="Обновить стадию"
                 }
 
                 override fun itemDelete(pos: Int) {

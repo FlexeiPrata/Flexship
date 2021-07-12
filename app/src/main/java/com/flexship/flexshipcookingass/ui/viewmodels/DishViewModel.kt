@@ -15,10 +15,14 @@ class DishViewModel @Inject constructor(
 ) : ViewModel() {
 
     val _stageList = MutableLiveData<MutableList<Stages>>()
+
     //val stageList: LiveData<MutableList<Stages>> = _stageList
     val stageList get() = _stageList as LiveData<MutableList<Stages>>
 
     val bufferStageList = mutableListOf<Stages>()
+
+    var stageToEdit: Stages? = null
+    var posToEdit:Int = -1
 
     var isUpdated = false
     var isSaved = false
@@ -81,6 +85,11 @@ class DishViewModel @Inject constructor(
     fun deleteNotSavedStages(ids: List<Int>) = viewModelScope.launch(Dispatchers.IO) {
         cookRepository.deleteNotSavedStages(ids)
     }
+
+    fun updateStage(stage: Stages) = viewModelScope.launch(Dispatchers.IO) {
+        cookRepository.updateStage(stage)
+    }
+
     val getMaxIdStage = cookRepository.getMaxIdOfStage().asLiveData()
 
 

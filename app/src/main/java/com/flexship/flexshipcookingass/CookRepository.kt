@@ -43,5 +43,7 @@ class CookRepository @Inject constructor(
 
     fun getMaxIdOfStage() = cookDao.getMaxIdOfStage()
 
+    suspend fun updateStage(stages: Stages) = cookDao.updateStage(stages)
+
 
 }

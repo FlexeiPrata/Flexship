@@ -39,6 +39,9 @@ interface CookDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateStages(stages: List<Stages>)
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateStage(stage: Stages)
+
     //получаем лист стадий по ID
     @Transaction
     @Query("SELECT * FROM dish_table where id = :dishId")
