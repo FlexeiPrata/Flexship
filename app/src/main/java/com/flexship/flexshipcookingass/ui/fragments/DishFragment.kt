@@ -252,6 +252,9 @@ class DishFragment : Fragment() {
         if (timeSec != 0) {
             setTimeToButton(timeSec)
         }
+        if(viewModel.isStageEdit){
+            b_add_stage.text="Обновить стадию"
+        }
     }
 
 

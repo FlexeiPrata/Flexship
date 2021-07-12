@@ -73,11 +73,18 @@ class StageAdapter(
 
     private val diffUtil = object: DiffUtil.ItemCallback<Stages>() {
         override fun areItemsTheSame(oldItem: Stages, newItem: Stages): Boolean {
-            return oldItem == newItem
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: Stages, newItem: Stages): Boolean {
-            return oldItem.hashCode()==newItem.hashCode() && oldItem == newItem
+            return when{
+                oldItem.id!=newItem.id->false
+                oldItem.name!=newItem.name->false
+                oldItem.time!=newItem.time->false
+                oldItem.dishId!=newItem.dishId->false
+                oldItem.isCooking!=newItem.isCooking->false
+                else->true
+            }
         }
     }
     val differ = AsyncListDiffer(this, diffUtil)
