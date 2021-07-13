@@ -32,7 +32,7 @@ class CookingFragment : Fragment() {
     private val args: CookingFragmentArgs by navArgs()
 
     private lateinit var dish: Dish
-    private var stageList: List<Stages> = listOf()
+    private var stageList = mutableListOf<Stages>()
 
     private val viewModel: DishViewModel by viewModels()
 
@@ -78,7 +78,7 @@ class CookingFragment : Fragment() {
         viewModel.getDishById(args.dishId).observe(viewLifecycleOwner) { dishWithStages ->
 
             dishWithStages?.let {
-                stageList = it.stages
+                stageList = it.stages.toMutableList()
                 dish = it.dish
             }
 
@@ -175,9 +175,21 @@ class CookingFragment : Fragment() {
             currentPos = posInList
         }
         try {
-            stageList[currentPos].isCooking=true
-            //stageAdapter.submitList(stageList)
-            currentStage = stageAdapter.differ.currentList[currentPos++]
+            val buf=stageList.toMutableList()
+            currentStage=buf[currentPos].copy()
+            currentStage!!.isCooking=true
+            buf[currentPos] = currentStage!!
+            if(currentPos!=0){
+                val previousStage=buf[currentPos-1].copy()
+                previousStage.isCooking=false
+                buf[currentPos-1]=previousStage
+            }
+            stageList.apply {
+                clear()
+                addAll(buf)
+            }
+            stageAdapter.differ.submitList(stageList.toList())
+            currentPos++
         } catch (ex: Exception) {
             ex.printStackTrace()
         }

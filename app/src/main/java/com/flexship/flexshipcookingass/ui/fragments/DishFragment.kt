@@ -215,17 +215,22 @@ class DishFragment : Fragment() {
 
     }
     private fun updateStage(stageName: String){
-        viewModel.stageToEdit?.let{
-            it.name=stageName
-            it.time=timeSec.toLong()
-            viewModel.updateStage(it)
-            if(viewModel.isNewDish){
-                viewModel._stageList.value?.apply {
-                    set(viewModel.posToEdit,it)
-                    viewModel._stageList.postValue(this)
-                }
+        val stage=Stages(name = stageName,time = timeSec.toLong(),dishId = dishId,id = viewModel.stageToEdit?.id!!)
+        viewModel.updateStage(stage)
+        if(viewModel.isNewDish){
+            viewModel._stageList.value?.apply {
+                set(viewModel.posToEdit,stage)
+                viewModel._stageList.postValue(this)
             }
         }
+        viewModel.bufferStageList.apply {
+            if(contains(viewModel.stageToEdit)){
+                remove(viewModel.stageToEdit)
+                add(stage)
+            }
+        }
+
+
         viewModel.isStageEdit=false
         binding.edStages.setText("")
         timeSec=0
@@ -364,7 +369,7 @@ class DishFragment : Fragment() {
                 override fun itemEdit(pos: Int) {
                     viewModel.posToEdit=pos
                     viewModel.isStageEdit = true
-                    val stage= viewModel.stageList.value?.get(pos)!!.copy()
+                    val stage= stageAdapter.differ.currentList[pos]
                     viewModel.stageToEdit=stage
                     ed_stages.setText(stage.name)
                     timeSec=stage.time.toInt()
