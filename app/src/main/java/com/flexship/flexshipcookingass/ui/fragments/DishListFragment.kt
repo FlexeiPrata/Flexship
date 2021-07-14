@@ -1,15 +1,13 @@
 package com.flexship.flexshipcookingass.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -23,6 +21,7 @@ import com.flexship.flexshipcookingass.other.Constans
 import com.flexship.flexshipcookingass.other.getTitleCategory
 import com.flexship.flexshipcookingass.services.CookService
 import com.flexship.flexshipcookingass.ui.dialogs.DialogFragmentToDelete
+import com.flexship.flexshipcookingass.ui.other.MainActivity
 import com.flexship.flexshipcookingass.ui.viewmodels.DishListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -39,7 +38,6 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
 
     private val args: DishListFragmentArgs by navArgs()
 
-    private var dishToDelete: Dish? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,26 +60,14 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
 
             dialogToDelete?.apply {
                 setAction {
-                    viewModel.deleteDish(dishToDelete!!)
-                    Snackbar.make(
-                        requireView(),
-                        "Dish was successfully deleted!",
-                        Snackbar.LENGTH_LONG
-                    )
-                        .setAction("UNDO") {
-                            viewModel.insertDish(dishToDelete!!)
-                        }
-                        .show()
+                    deleteDish()
                 }
             }
         }
 
-        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
+        (requireActivity() as MainActivity).supportActionBar?.apply {
             title= getTitleCategory(args.categoryId)
-            setNavigationIcon(R.drawable.ic_back)
-            setNavigationOnClickListener {
-                findNavController().popBackStack()
-            }
+            setDisplayHomeAsUpEnabled(true)
         }
 
         binding.recViewDishes.apply {
@@ -127,17 +113,19 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
                 putInt("dishId", dish.id)
             }
             findNavController().navigate(R.id.action_recipeListFragment_to_cookingFragment, bundle)
-        }
-        else {
+        } else {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.alert_title_is_cooking))
                 .setMessage(getString(R.string.alert_message_is_cooking))
-                .setPositiveButton(R.string.yes){_, _ ->
+                .setPositiveButton(R.string.yes) { _, _ ->
                     val bundle = Bundle().apply {
                         putInt("dishId", CookService.currentDishId)
                         putInt("posInList", CookService.posInList)
                     }
-                    findNavController().navigate(R.id.action_recipeListFragment_to_cookingFragment, bundle)
+                    findNavController().navigate(
+                        R.id.action_recipeListFragment_to_cookingFragment,
+                        bundle
+                    )
                 }
                 .setNegativeButton(R.string.no, null)
                 .show()
@@ -146,8 +134,16 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
 
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId==android.R.id.home){
+            findNavController().popBackStack()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onDishDeleted(dish: Dish) {
-        dishToDelete = dish
+        viewModel.dishToDelete = dish
         callDialogToDelete(dish)
     }
 
@@ -159,17 +155,23 @@ class DishListFragment : Fragment(), DishAdapter.OnDishClick {
     }
 
     private fun callDialogToDelete(dish: Dish) {
-        //ПОМЕНЯТЬ!!!!!!!!!
-        DialogFragmentToDelete().apply {
+        DialogFragmentToDelete.newInstance(
+            getString(R.string.dialog_del_m),
+            getString(R.string.dialog_del_dish_t)
+        ).apply {
             setAction {
-                viewModel.deleteDish(dish)
-                Snackbar.make(requireView(), "Dish was successfully deleted!", Snackbar.LENGTH_LONG)
-                    .setAction("UNDO") {
-                        viewModel.insertDish(dish)
-                    }
-                    .show()
+                deleteDish()
             }
         }.show(parentFragmentManager, Constans.TAG_DIALOG_DELETE)
+    }
+
+    private fun deleteDish() {
+        viewModel.deleteDish(viewModel.dishToDelete)
+        Snackbar.make(requireView(), "Dish was successfully deleted!", Snackbar.LENGTH_LONG)
+            .setAction("UNDO") {
+                viewModel.insertDish(viewModel.dishToDelete)
+            }
+            .show()
     }
 
 

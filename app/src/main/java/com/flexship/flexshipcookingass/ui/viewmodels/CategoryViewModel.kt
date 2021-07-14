@@ -2,7 +2,7 @@ package com.flexship.flexshipcookingass.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import com.flexship.flexshipcookingass.CookRepository
+import com.flexship.flexshipcookingass.ui.other.CookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

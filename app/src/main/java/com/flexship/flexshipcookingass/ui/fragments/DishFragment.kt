@@ -12,9 +12,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
@@ -23,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -40,6 +40,7 @@ import com.flexship.flexshipcookingass.other.LOG_ID
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import com.flexship.flexshipcookingass.ui.dialogs.DialogFragmentToDelete
 import com.flexship.flexshipcookingass.ui.dialogs.MinutePickerDialog
+import com.flexship.flexshipcookingass.ui.other.MainActivity
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -138,22 +139,21 @@ class DishFragment : Fragment() {
                         dish = dishWithStages.dish
                         setValues()
                     }
-                    setupToolbar(String.format(getString(R.string.dish_title), dish.name))
                     viewModel.isUpdated = true
-
+                    setupActionBar("Блюдо:${dish.name}")
                 }
                 viewModel._stageList.postValue(dishWithStages.stages.toMutableList())
             }
             binding.bInsertDish.text = "Обновить"
         } else {
             dish = Dish()
-            setupToolbar("Новое блюдо")
             viewModel.getMaxIdDish().observe(viewLifecycleOwner) {
                 dishId = 1
                 it?.let {
                     dishId = it + 1
                 }
             }
+            setupActionBar("Новое блюдо")
         }
         viewModel.getMaxIdStage.observe(viewLifecycleOwner) {
             stageId = 1
@@ -179,9 +179,9 @@ class DishFragment : Fragment() {
             val stageName = edStages.text.toString()
 
             if (stageName.isNotEmpty()) {
-                if(!viewModel.isStageEdit){
+                if (!viewModel.isStageEdit) {
                     submitNewStage(stageName)
-                }else{
+                } else {
                     updateStage(stageName)
                 }
             } else {
@@ -204,7 +204,7 @@ class DishFragment : Fragment() {
         super.onStop()
 
         if (!requireActivity().isChangingConfigurations) {
-            for (i in viewModel.bufferStageList){
+            for (i in viewModel.bufferStageList) {
                 viewModel.deleteStage(i)
             }
 
@@ -214,28 +214,34 @@ class DishFragment : Fragment() {
         }
 
     }
-    private fun updateStage(stageName: String){
-        val stage=Stages(name = stageName,time = timeSec.toLong(),dishId = dishId,id = viewModel.stageToEdit?.id!!)
+
+    private fun updateStage(stageName: String) {
+        val stage = Stages(
+            name = stageName,
+            time = timeSec.toLong(),
+            dishId = dishId,
+            id = viewModel.stageToEdit?.id!!
+        )
         viewModel.updateStage(stage)
-        if(viewModel.isNewDish){
+        if (viewModel.isNewDish) {
             viewModel._stageList.value?.apply {
-                set(viewModel.posToEdit,stage)
+                set(viewModel.posToEdit, stage)
                 viewModel._stageList.postValue(this)
             }
         }
         viewModel.bufferStageList.apply {
-            if(contains(viewModel.stageToEdit)){
+            if (contains(viewModel.stageToEdit)) {
                 remove(viewModel.stageToEdit)
                 add(stage)
             }
         }
 
 
-        viewModel.isStageEdit=false
+        viewModel.isStageEdit = false
         binding.edStages.setText("")
-        timeSec=0
-        binding.bTime.text="Указать время"
-        binding.bAddStage.text="Добавить"
+        timeSec = 0
+        binding.bTime.text = "Указать время"
+        binding.bAddStage.text = "Добавить"
     }
 
     private fun setNotSavedValues() {
@@ -245,8 +251,8 @@ class DishFragment : Fragment() {
         if (timeSec != 0) {
             setTimeToButton(timeSec)
         }
-        if(viewModel.isStageEdit){
-            b_add_stage.text="Обновить стадию"
+        if (viewModel.isStageEdit) {
+            b_add_stage.text = "Обновить стадию"
         }
     }
 
@@ -311,6 +317,7 @@ class DishFragment : Fragment() {
         val name = edName.text.toString()
         val receipt = edReceipt.text.toString()
         if (name != dish.name || receipt != dish.recipe || viewModel.bufferStageList.isNotEmpty()) {
+            Log.d(LOG_ID,"ADSADSA")
             showDialogToDelete()
         } else {
             findNavController().popBackStack()
@@ -329,15 +336,6 @@ class DishFragment : Fragment() {
 
     //ЭТО не ТРОГАТЬ
 
-    private fun setupToolbar(titleT: String) {
-        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
-            title = titleT
-            setNavigationIcon(R.drawable.ic_back)
-            setNavigationOnClickListener {
-                checkFieldsForUpdateIfNotSaved()
-            }
-        }
-    }
 
 
     private fun setTimeToButton(timeSec: Int) {
@@ -346,6 +344,20 @@ class DishFragment : Fragment() {
             zeroOrNotZero(timeSec / 60),
             zeroOrNotZero(timeSec % 60)
         )
+    }
+    private fun setupActionBar(titleT: String){
+        (requireActivity() as MainActivity).supportActionBar?.apply {
+            title=titleT
+            setDisplayHomeAsUpEnabled(true)
+        }
+    }
+    //ДИАЛОГ НЕ ПОКАЗЫВАЕТСЯ
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId==android.R.id.home){
+            checkFieldsForUpdateIfNotSaved()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun setupUI() {
@@ -367,25 +379,25 @@ class DishFragment : Fragment() {
                 }
 
                 override fun itemEdit(pos: Int) {
-                    viewModel.posToEdit=pos
+                    viewModel.posToEdit = pos
                     viewModel.isStageEdit = true
-                    val stage= stageAdapter.differ.currentList[pos]
-                    viewModel.stageToEdit=stage
+                    val stage = stageAdapter.differ.currentList[pos]
+                    viewModel.stageToEdit = stage
                     ed_stages.setText(stage.name)
-                    timeSec=stage.time.toInt()
+                    timeSec = stage.time.toInt()
                     setTimeToButton(timeSec)
-                    b_add_stage.text="Обновить стадию"
+                    b_add_stage.text = "Обновить стадию"
                 }
 
                 override fun itemDelete(pos: Int) {
                     viewModel.isBuffer = false
                     val stage = viewModel.stageList.value?.get(pos)!!
                     viewModel.deleteStage(stage)
-                    var stageToDelete: Stages?=null
+                    var stageToDelete: Stages? = null
                     for (buf in viewModel.bufferStageList) {
 
                         if (stage == buf) {
-                            stageToDelete=stage
+                            stageToDelete = stage
                             viewModel.isBuffer = true
                         }
                     }

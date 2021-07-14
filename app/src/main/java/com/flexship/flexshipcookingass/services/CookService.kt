@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-import com.flexship.flexshipcookingass.MainActivity
+import com.flexship.flexshipcookingass.ui.other.MainActivity
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.other.Constans
 import com.flexship.flexshipcookingass.other.Constans.ACTION_PAUSE
@@ -23,10 +23,10 @@ import com.flexship.flexshipcookingass.other.Constans.KEY_POSITION_IN_LIST
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_ID
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_NAME
 import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_ID
+import com.flexship.flexshipcookingass.other.LOG_ID
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class CookService : LifecycleService() {
@@ -61,7 +61,9 @@ class CookService : LifecycleService() {
                     pauseService()
                 }
                 ACTION_STOP -> {
-                    cancelService()
+                    if(isWorking){
+                        cancelService()
+                    }
                 }
             }
         }
@@ -77,7 +79,6 @@ class CookService : LifecycleService() {
         super.onCreate()
 
 
-        postInitialValues()
 
         isCooking.observe(this) {
             updateNotification(it)
@@ -147,6 +148,7 @@ class CookService : LifecycleService() {
 
         isFirstCooking = false
         isWorking = true
+        postInitialValues()
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

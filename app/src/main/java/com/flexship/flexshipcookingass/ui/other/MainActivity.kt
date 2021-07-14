@@ -1,15 +1,14 @@
-package com.flexship.flexshipcookingass
+package com.flexship.flexshipcookingass.ui.other
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
+import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.ActivityMainBinding
 import com.flexship.flexshipcookingass.other.Constans
-import com.flexship.flexshipcookingass.other.LOG_ID
 import com.flexship.flexshipcookingass.services.CookService
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint

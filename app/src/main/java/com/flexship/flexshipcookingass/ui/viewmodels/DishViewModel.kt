@@ -1,7 +1,7 @@
 package com.flexship.flexshipcookingass.ui.viewmodels
 
 import androidx.lifecycle.*
-import com.flexship.flexshipcookingass.CookRepository
+import com.flexship.flexshipcookingass.ui.other.CookRepository
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
 import dagger.hilt.android.lifecycle.HiltViewModel

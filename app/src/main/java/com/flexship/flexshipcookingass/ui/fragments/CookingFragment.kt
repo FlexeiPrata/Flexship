@@ -21,6 +21,7 @@ import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
 import com.flexship.flexshipcookingass.other.*
 import com.flexship.flexshipcookingass.services.CookService
+import com.flexship.flexshipcookingass.ui.other.MainActivity
 import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.Exception
@@ -61,13 +62,6 @@ class CookingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
-            title = "Приготовление блюда"
-            setNavigationIcon(R.drawable.ic_back)
-            setNavigationOnClickListener {
-                findNavController().popBackStack()
-            }
-        }
 
         binding.recViewStage.apply {
             layoutManager = LinearLayoutManager(context)
@@ -75,13 +69,13 @@ class CookingFragment : Fragment() {
             adapter = stageAdapter
         }
 
+
         viewModel.getDishById(args.dishId).observe(viewLifecycleOwner) { dishWithStages ->
 
             dishWithStages?.let {
                 stageList = it.stages.toMutableList()
                 dish = it.dish
             }
-
 
             if(stageList.isEmpty()){
                 binding.recViewStage.isVisible=false
@@ -93,8 +87,13 @@ class CookingFragment : Fragment() {
             }else if(stageList.size==1){
                 binding.fabNext.isVisible=false
             }
+            (requireActivity() as MainActivity).supportActionBar?.apply {
+                title="Блюдо:$dish"
+                setDisplayHomeAsUpEnabled(true)
+            }
             followToNewStage(args.posInList)
         }
+
 
         subscribeToObservers()
 
@@ -175,19 +174,17 @@ class CookingFragment : Fragment() {
             currentPos = posInList
         }
         try {
-            val buf=stageList.toMutableList()
+            //currentStage=stageList[currentPos].copy()
+            val buf=stageList.copyList()
             currentStage=buf[currentPos].copy()
             currentStage!!.isCooking=true
-            buf[currentPos] = currentStage!!
+            buf[currentPos]=currentStage!!
             if(currentPos!=0){
                 val previousStage=buf[currentPos-1].copy()
                 previousStage.isCooking=false
                 buf[currentPos-1]=previousStage
             }
-            stageList.apply {
-                clear()
-                addAll(buf)
-            }
+            stageList=buf.copyList()
             stageAdapter.differ.submitList(stageList.toList())
             currentPos++
         } catch (ex: Exception) {

@@ -18,6 +18,7 @@ import com.flexship.flexshipcookingass.models.Category
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.other.CATEGORY_ID
 import com.flexship.flexshipcookingass.other.getTitleCategory
+import com.flexship.flexshipcookingass.ui.other.MainActivity
 import com.flexship.flexshipcookingass.ui.viewmodels.CategoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,15 +45,16 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().findViewById<Toolbar>(R.id.main_toolbar).apply {
-            navigationIcon = null
-            title = getString(R.string.category)
-        }
 
         viewModel.categoriesID.observe(viewLifecycleOwner) {
             it?.let {
                 updateUI(it)
             }
+        }
+
+        (requireActivity() as MainActivity).supportActionBar?.apply {
+            title="Категории"
+            setDisplayHomeAsUpEnabled(false)
         }
 
     }

@@ -1,4 +1,4 @@
-package com.flexship.flexshipcookingass
+package com.flexship.flexshipcookingass.ui.other
 
 import androidx.lifecycle.asLiveData
 import com.flexship.flexshipcookingass.db.CookDao
