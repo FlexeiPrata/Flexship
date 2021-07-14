@@ -77,19 +77,18 @@ class CookingFragment : Fragment() {
                 dish = it.dish
             }
 
-            if(stageList.isEmpty()){
-                binding.recViewStage.isVisible=false
-                binding.layoutEmpty.isVisible=true
-                binding.fabNext.isVisible=false
-                binding.fabStop.isVisible=false
-                binding.fabPauseOrResume.isVisible=false
-                binding.textViewName.isVisible=false
-            }else if(stageList.size==1){
-                binding.fabNext.isVisible=false
+            if (stageList.isEmpty()) {
+                binding.recViewStage.isVisible = false
+                binding.layoutEmpty.isVisible = true
+                binding.fabNext.isVisible = false
+                binding.fabStop.isVisible = false
+                binding.fabPauseOrResume.isVisible = false
+                binding.textViewName.isVisible = false
+            } else if (stageList.size == 1) {
+                binding.fabNext.isVisible = false
             }
             (requireActivity() as MainActivity).supportActionBar?.apply {
-                title="Блюдо:$dish"
-                setDisplayHomeAsUpEnabled(true)
+                title = "Блюдо : ${dish.name}"
             }
             followToNewStage(args.posInList)
         }
@@ -134,7 +133,6 @@ class CookingFragment : Fragment() {
         binding.apply {
 
             fabNext.setOnClickListener {
-                CookService.isWorking = false
                 sendCommandToService(Constans.ACTION_STOP)
                 followToNewStage()
                 isNewStage = true
@@ -145,6 +143,7 @@ class CookingFragment : Fragment() {
                 if (isCooking) {
                     sendCommandToService(Constans.ACTION_PAUSE)
                 } else {
+                    Log.d(LOG_ID, "ACTION")
                     sendCommandToService(Constans.ACTION_START_RESUME)
                 }
             }
@@ -174,31 +173,21 @@ class CookingFragment : Fragment() {
             currentPos = posInList
         }
         try {
-            //currentStage=stageList[currentPos].copy()
-            val buf=stageList.copyList()
-            currentStage=buf[currentPos].copy()
-            currentStage!!.isCooking=true
-            buf[currentPos]=currentStage!!
-            if(currentPos!=0){
-                val previousStage=buf[currentPos-1].copy()
-                previousStage.isCooking=false
-                buf[currentPos-1]=previousStage
-            }
-            stageList=buf.copyList()
-            stageAdapter.differ.submitList(stageList.toList())
+            currentStage = stageList[currentPos].copy()
+            stageAdapter.submitList(stageList.toList(), currentPos)
             currentPos++
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-        if(currentPos==stageList.size){
-            binding.fabNext.isVisible=false
+        if (currentPos == stageList.size) {
+            binding.fabNext.isVisible = false
         }
 
         binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
         binding.textViewFinisher.isVisible = false
         binding.textViewTimer.text = ""
 
-        if (CookService.isWorking && time <= 0L){
+        if (CookService.isWorking && time <= 0L) {
             binding.textViewFinisher.isVisible = true
             binding.textViewTimer.text = "00:00"
         }

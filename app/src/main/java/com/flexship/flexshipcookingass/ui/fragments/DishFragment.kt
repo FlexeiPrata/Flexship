@@ -2,6 +2,7 @@ package com.flexship.flexshipcookingass.ui.fragments
 
 import android.app.Activity.RESULT_OK
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,14 +13,11 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -45,9 +43,9 @@ import com.flexship.flexshipcookingass.ui.viewmodels.DishViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_dish.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import java.io.ByteArrayOutputStream
+
 
 @AndroidEntryPoint
 class DishFragment : Fragment() {
@@ -70,15 +68,6 @@ class DishFragment : Fragment() {
 
     private var stageId: Int = -1
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        requireActivity().onBackPressedDispatcher.addCallback(this) {
-            checkFieldsForUpdateIfNotSaved()
-        }
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -162,8 +151,13 @@ class DishFragment : Fragment() {
             }
         }
         viewModel.stageList.observe(viewLifecycleOwner) {
-            stageAdapter.differ.submitList(it.toList())
+            stageAdapter.submitList(it.toList())
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            checkFieldsForUpdateIfNotSaved()
+        }
+
 
 
     }
@@ -252,13 +246,12 @@ class DishFragment : Fragment() {
             setTimeToButton(timeSec)
         }
         if (viewModel.isStageEdit) {
-            b_add_stage.text = "Обновить стадию"
+            binding.bAddStage.text = "Обновить стадию"
         }
     }
 
 
-    private fun
-            setValues() = with(binding) {
+    private fun setValues() = with(binding) {
 
         bitmap = dish.image
         edName.setText(dish.name)
@@ -317,12 +310,14 @@ class DishFragment : Fragment() {
         val name = edName.text.toString()
         val receipt = edReceipt.text.toString()
         if (name != dish.name || receipt != dish.recipe || viewModel.bufferStageList.isNotEmpty()) {
-            Log.d(LOG_ID,"ADSADSA")
+            Log.d(LOG_ID, "ADSADSA")
             showDialogToDelete()
         } else {
             findNavController().popBackStack()
         }
     }
+
+
 
     private fun showDialogToDelete() = DialogFragmentToDelete.newInstance(
         getString(R.string.dialog_del_mes),
@@ -334,8 +329,8 @@ class DishFragment : Fragment() {
     }.show(parentFragmentManager, Constans.TAG_DIALOG_DELETE)
 
 
-    //ЭТО не ТРОГАТЬ
 
+    //ЭТО не ТРОГАТЬ
 
 
     private fun setTimeToButton(timeSec: Int) {
@@ -345,19 +340,21 @@ class DishFragment : Fragment() {
             zeroOrNotZero(timeSec % 60)
         )
     }
-    private fun setupActionBar(titleT: String){
+
+    private fun setupActionBar(titleT: String) {
+        setHasOptionsMenu(true)
         (requireActivity() as MainActivity).supportActionBar?.apply {
-            title=titleT
-            setDisplayHomeAsUpEnabled(true)
+            title = titleT
         }
     }
+
+
     //ДИАЛОГ НЕ ПОКАЗЫВАЕТСЯ
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId==android.R.id.home){
-            checkFieldsForUpdateIfNotSaved()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
+        Log.d(LOG_ID, "On option")
+        checkFieldsForUpdateIfNotSaved()
+        return true
+        //super.onOptionsItemSelected(item)
     }
 
     private fun setupUI() {
@@ -366,7 +363,6 @@ class DishFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             stageAdapter = StageAdapter(context)
             adapter = stageAdapter
-
 
         }.also {
             val itemListener = ItemTouchHelper(object : DragAndDropSwappable(requireContext()) {
@@ -381,12 +377,12 @@ class DishFragment : Fragment() {
                 override fun itemEdit(pos: Int) {
                     viewModel.posToEdit = pos
                     viewModel.isStageEdit = true
-                    val stage = stageAdapter.differ.currentList[pos]
+                    val stage = stageAdapter.items[pos]
                     viewModel.stageToEdit = stage
-                    ed_stages.setText(stage.name)
+                    binding.edStages.setText(stage.name)
                     timeSec = stage.time.toInt()
                     setTimeToButton(timeSec)
-                    b_add_stage.text = "Обновить стадию"
+                    binding.bAddStage.text = "Обновить стадию"
                 }
 
                 override fun itemDelete(pos: Int) {

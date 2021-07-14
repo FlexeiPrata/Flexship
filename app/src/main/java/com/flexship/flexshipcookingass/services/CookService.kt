@@ -51,7 +51,7 @@ class CookService : LifecycleService() {
                         timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
                         currentDishId = it.getIntExtra(KEY_DISH_ID, 0)
                         posInList = it.getIntExtra(KEY_POSITION_IN_LIST, 0)
-
+                        Log.d(LOG_ID, "On start time = $timeToCook")
                         startForegroundService()
                     } else {
                         runTimer()
@@ -64,6 +64,7 @@ class CookService : LifecycleService() {
                     if(isWorking){
                         cancelService()
                     }
+                    else isFirstCooking = true
                 }
             }
         }
