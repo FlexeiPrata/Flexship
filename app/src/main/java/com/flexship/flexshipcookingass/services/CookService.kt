@@ -61,10 +61,7 @@ class CookService : LifecycleService() {
                     pauseService()
                 }
                 ACTION_STOP -> {
-                    if(isWorking){
-                        cancelService()
-                    }
-                    else isFirstCooking = true
+                    cancelService()
                 }
             }
         }
@@ -128,7 +125,7 @@ class CookService : LifecycleService() {
 
     private fun postInitialValues() {
         isCooking.postValue(false)
-        //timer.postValue(0)
+        //timer.postValue(0L)
     }
 
     private fun runTimer() {
@@ -208,10 +205,12 @@ class CookService : LifecycleService() {
 
 
     private fun cancelService() {
-        isWorking = false
-        isCanceled = true
-        postInitialValues()
-        stopForeground(true)
+        if(isWorking){
+            isWorking = false
+            isCanceled = true
+            postInitialValues()
+            stopForeground(true)
+        }
         stopSelf()
     }
 

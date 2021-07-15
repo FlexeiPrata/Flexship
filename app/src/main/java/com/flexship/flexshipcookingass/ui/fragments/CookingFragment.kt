@@ -104,18 +104,22 @@ class CookingFragment : Fragment() {
         CookService.timer.observe(viewLifecycleOwner) { time ->
             this.time = time
             if (time <= 0L) {
+                Log.d(LOG_ID,"BIG DICK")
                 binding.textViewFinisher.isVisible = true
             }
 
-            binding.textViewTimer.text = String.format(
-                getString(R.string.timer),
-                zeroOrNotZero(time / 1000 / 60),
-                zeroOrNotZero(time / 1000 % 60)
-            )
+            binding.textViewTimer.text =getFormattedTime(time)
         }
         CookService.isCooking.observe(viewLifecycleOwner) {
             updateToggle(it)
         }
+    }
+    private fun getFormattedTime(time:Long):String{
+        return String.format(
+            getString(R.string.timer),
+            zeroOrNotZero(time / 1000 / 60),
+            zeroOrNotZero(time / 1000 % 60)
+        )
     }
 
     private fun updateToggle(isCooking: Boolean) {
@@ -136,6 +140,7 @@ class CookingFragment : Fragment() {
                 sendCommandToService(Constans.ACTION_STOP)
                 followToNewStage()
                 isNewStage = true
+                Log.d(LOG_ID,"TIME:${CookService.timer.value}")
             }
 
             fabPauseOrResume.setOnClickListener {
@@ -184,13 +189,14 @@ class CookingFragment : Fragment() {
         }
 
         binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
+        Log.d(LOG_ID,"BIG DICK2")
         binding.textViewFinisher.isVisible = false
-        binding.textViewTimer.text = ""
+        binding.textViewTimer.text = getFormattedTime(currentStage!!.time*1000L)
 
-        if (CookService.isWorking && time <= 0L) {
-            binding.textViewFinisher.isVisible = true
-            binding.textViewTimer.text = "00:00"
-        }
+//        if (CookService.isWorking && time <= 0L) {
+//            binding.textViewFinisher.isVisible = true
+//            binding.textViewTimer.text = "00:00"
+//        }
 
     }
 
