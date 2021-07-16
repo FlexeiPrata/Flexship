@@ -18,8 +18,10 @@ import com.flexship.flexshipcookingass.models.Category
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.other.CATEGORY_ID
 import com.flexship.flexshipcookingass.other.getTitleCategory
+import com.flexship.flexshipcookingass.services.CookService
 import com.flexship.flexshipcookingass.ui.other.MainActivity
 import com.flexship.flexshipcookingass.ui.viewmodels.CategoryViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -65,6 +67,7 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
             findNavController().navigate(R.id.action_categoryFragment_to_dishFragment)
         }
     }
+
 
     override fun onCategoryClicked(categoryId: Int) {
         val bundle = Bundle().apply {

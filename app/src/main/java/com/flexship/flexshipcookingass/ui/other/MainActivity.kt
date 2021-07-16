@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.ActivityMainBinding
 import com.flexship.flexshipcookingass.other.Constans
@@ -18,6 +20,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private var isNotificationRequired = true
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +35,27 @@ class MainActivity : AppCompatActivity() {
         navigateToCookingFragment(intent)
 
         //checkIfServiceAvailable()
+        checkService()
+    }
 
+    private fun checkService() {
+        if (CookService.isWorking && isNotificationRequired) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(getString(R.string.alert_title_is_cooking))
+                .setMessage(getString(R.string.alert_message_is_cooking))
+                .setPositiveButton(R.string.yes) { _, _ ->
+                    val bundle = Bundle().apply {
+                        putInt("dishId", CookService.currentDishId)
+                        putInt("posInList", CookService.posInList)
+                    }
+                    navController.navigate(
+                        R.id.action_categoryFragment_to_cookingFragment,
+                        bundle
+                    )
+                }
+                .setNegativeButton(R.string.no, null)
+                .show()
+        }
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -53,16 +77,13 @@ class MainActivity : AppCompatActivity() {
                     putInt("dishId",dishId)
                     putInt("posInList",posInList)
                 }
+                isNotificationRequired = false
                 navController.navigate(R.id.action_to_cookingFragment,bundle)
             }
         }
 
     }
-    private fun checkIfServiceAvailable(){
-        if(CookService.isWorking){
-            alertDialogToReturn()
-        }
-    }
+
     private fun alertDialogToReturn() = MaterialAlertDialogBuilder(this)
         .setTitle("Не завершенная готовка")
         .setMessage("Вы не завершили предыдущую готовку." +

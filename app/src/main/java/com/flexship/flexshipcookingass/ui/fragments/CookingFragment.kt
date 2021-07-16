@@ -46,6 +46,7 @@ class CookingFragment : Fragment() {
     private var isNewStage = true
 
     private var isExpanded = true
+
     private var time = 0L
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,16 +86,17 @@ class CookingFragment : Fragment() {
                 binding.fabPauseOrResume.isVisible = false
                 binding.textViewName.isVisible = false
             } else if (stageList.size == 1) {
-                binding.fabNext.isVisible = false
+                binding.fabNext.visibility = View.INVISIBLE
             }
             (requireActivity() as MainActivity).supportActionBar?.apply {
                 title = "Блюдо : ${dish.name}"
             }
             followToNewStage(args.posInList)
         }
-
-
         subscribeToObservers()
+
+
+
 
 
     }
@@ -104,17 +106,17 @@ class CookingFragment : Fragment() {
         CookService.timer.observe(viewLifecycleOwner) { time ->
             this.time = time
             if (time <= 0L) {
-                Log.d(LOG_ID,"BIG DICK")
                 binding.textViewFinisher.isVisible = true
             }
 
-            binding.textViewTimer.text =getFormattedTime(time)
+            binding.textViewTimer.text = getFormattedTime(time)
         }
         CookService.isCooking.observe(viewLifecycleOwner) {
             updateToggle(it)
         }
     }
-    private fun getFormattedTime(time:Long):String{
+
+    private fun getFormattedTime(time: Long): String {
         return String.format(
             getString(R.string.timer),
             zeroOrNotZero(time / 1000 / 60),
@@ -140,7 +142,6 @@ class CookingFragment : Fragment() {
                 sendCommandToService(Constans.ACTION_STOP)
                 followToNewStage()
                 isNewStage = true
-                Log.d(LOG_ID,"TIME:${CookService.timer.value}")
             }
 
             fabPauseOrResume.setOnClickListener {
@@ -148,7 +149,6 @@ class CookingFragment : Fragment() {
                 if (isCooking) {
                     sendCommandToService(Constans.ACTION_PAUSE)
                 } else {
-                    Log.d(LOG_ID, "ACTION")
                     sendCommandToService(Constans.ACTION_START_RESUME)
                 }
             }
@@ -189,9 +189,10 @@ class CookingFragment : Fragment() {
         }
 
         binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
-        Log.d(LOG_ID,"BIG DICK2")
-        binding.textViewFinisher.isVisible = false
-        binding.textViewTimer.text = getFormattedTime(currentStage!!.time*1000L)
+        if (!CookService.isWorking && time <= 0) binding.textViewFinisher.isVisible = false
+
+        if (isNewStage) binding.textViewTimer.text = getFormattedTime(currentStage!!.time * 1000L)
+
 
 //        if (CookService.isWorking && time <= 0L) {
 //            binding.textViewFinisher.isVisible = true

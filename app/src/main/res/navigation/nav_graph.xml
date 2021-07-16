@@ -24,6 +24,9 @@
         <action
             android:id="@+id/action_categoryFragment_to_dishFragment"
             app:destination="@id/dishFragment" />
+        <action
+            android:id="@+id/action_categoryFragment_to_cookingFragment"
+            app:destination="@id/cookingFragment" />
     </fragment>
     <fragment
         android:id="@+id/cookingFragment"
