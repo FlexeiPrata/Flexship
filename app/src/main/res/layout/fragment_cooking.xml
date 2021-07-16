@@ -7,106 +7,50 @@
     tools:context=".ui.fragments.CookingFragment">
 
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/rvBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/expand_collapse">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rec_view_stage"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <TextView
-        android:id="@+id/textViewName"
-        style="@style/MaterialTextViewAccent"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabStages"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textSize="20sp"
+        android:layout_marginTop="32dp"
+        android:clickable="true"
+        android:src="@drawable/ra_stage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewTimer"
-        tools:text="Текущий этап:" />
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/textViewTimer"
         style="@style/MaterialTextViewSemiAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:textSize="80sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvBox"
+        android:textSize="90sp"
+        app:layout_constraintBottom_toBottomOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="@+id/progressBar"
+        app:layout_constraintStart_toStartOf="@+id/progressBar"
+        app:layout_constraintTop_toTopOf="@+id/progressBar"
+        app:layout_constraintVertical_bias="0.45"
         tools:text="00:00" />
-
-    <ImageButton
-        android:id="@+id/expand_collapse"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_expand_button" />
 
     <TextView
         android:id="@+id/textViewFinisher"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="Этап завершён!"
+        android:layout_marginTop="8dp"
+        android:text="@string/stage_finished"
         android:textColor="?attr/colorPrimary"
         android:textSize="20sp"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/textViewTimer"
         app:layout_constraintStart_toStartOf="@+id/textViewTimer"
-        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
-
-    <LinearLayout
-        android:id="@+id/layout_empty"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/rvBox">
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:src="@drawable/baker" />
-
-        <TextView
-            android:id="@+id/textView"
-            style="@style/MaterialTextViewAccent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:text="У вас отсутствуют этапа приготовления для этого блюда. Дам по попе!!"
-            android:textSize="20sp" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="32dp"
         android:clickable="true"
         android:src="@drawable/ic_baseline_stop_24"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -116,7 +60,7 @@
         android:id="@+id/fabPauseOrResume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="32dp"
         android:clickable="true"
         android:src="@drawable/ic_baseline_play_arrow_24"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -128,10 +72,50 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="64dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="32dp"
         android:clickable="true"
         android:src="@drawable/ic_baseline_skip_next_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
+        android:background="@drawable/progress_shape"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressDrawable="@drawable/progress_drawable"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewName"
+        style="@style/MaterialTextViewSemiAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTimer"
+        tools:text="Текущий этап:" />
+
+    <TextView
+        android:id="@+id/textViewStagesDeco"
+        style="@style/MaterialTextViewAccent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/stages"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="@+id/fabStages"
+        app:layout_constraintStart_toStartOf="@+id/fabStages"
+        app:layout_constraintTop_toBottomOf="@+id/fabStages" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

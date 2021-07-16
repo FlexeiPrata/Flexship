@@ -24,7 +24,7 @@ object Constans {
     const val KEY_DISH="KEY_DISH"
 
 
-    const val DELAY_FOR_TIMER = 1000L
+    const val DELAY_FOR_TIMER = 10L
 
     const val ACTION_PENDING_INTENT = "ACTION_PENDING_INTENT"
 
@@ -33,5 +33,8 @@ object Constans {
     const val NOTIFICATION_CHANNEL_NAME = "Cooking"
     const val NOTIFICATION_ID = 1
 
+    //Баги
+    //При паузе прога не знает если блюдо уже готовится
+    //уведомление иногда показывает 00:00, иногда "Этап завершён"
 
 }

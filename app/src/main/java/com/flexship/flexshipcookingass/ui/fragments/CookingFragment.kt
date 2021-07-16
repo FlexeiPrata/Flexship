@@ -1,6 +1,7 @@
 package com.flexship.flexshipcookingass.ui.fragments
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,6 +10,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.CoreComponentFactory
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -37,22 +40,35 @@ class CookingFragment : Fragment() {
 
     private val viewModel: DishViewModel by viewModels()
 
-    private lateinit var stageAdapter: StageAdapter
 
     private var currentStage: Stages? = null
-    private var currentPos: Int = 0
+    private var currentPos: Int = -1
 
     private var isCooking = false
-    private var isNewStage = true
-
-    private var isExpanded = true
-
     private var time = 0L
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        currentPos = args.posInList + 1
+        Log.d(LOG_ID, currentPos.toString())
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+        viewModel.getDishById(args.dishId).observe(viewLifecycleOwner) { dishWithStages ->
+            subscribeToObservers()
+            dishWithStages?.let {
+                stageList = it.stages.toMutableList()
+                dish = it.dish
+                applyUI()
+            }
+
+            (requireActivity() as MainActivity).supportActionBar?.apply {
+                title = "Блюдо : ${dish.name}"
+            }
+        }
         val view = inflater.inflate(R.layout.fragment_cooking, container, false)
 
         binding = FragmentCookingBinding.bind(view)
@@ -62,57 +78,30 @@ class CookingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-        binding.recViewStage.apply {
-            layoutManager = LinearLayoutManager(context)
-            stageAdapter = StageAdapter(context)
-            adapter = stageAdapter
-        }
-
-
-        viewModel.getDishById(args.dishId).observe(viewLifecycleOwner) { dishWithStages ->
-
-            dishWithStages?.let {
-                stageList = it.stages.toMutableList()
-                dish = it.dish
-            }
-
-            if (stageList.isEmpty()) {
-                binding.recViewStage.isVisible = false
-                binding.layoutEmpty.isVisible = true
-                binding.fabNext.isVisible = false
-                binding.fabStop.isVisible = false
-                binding.fabPauseOrResume.isVisible = false
-                binding.textViewName.isVisible = false
-            } else if (stageList.size == 1) {
-                binding.fabNext.visibility = View.INVISIBLE
-            }
-            (requireActivity() as MainActivity).supportActionBar?.apply {
-                title = "Блюдо : ${dish.name}"
-            }
-            followToNewStage(args.posInList)
-        }
-        subscribeToObservers()
-
-
-
-
-
     }
 
 
     private fun subscribeToObservers() {
         CookService.timer.observe(viewLifecycleOwner) { time ->
             this.time = time
-            if (time <= 0L) {
-                binding.textViewFinisher.isVisible = true
+            binding.textViewFinisher.isVisible = time <= 0L
+
+
+            binding.apply {
+                textViewTimer.text = getFormattedTime(time)
+                currentStage?.let {
+                    val maxi = (it.time * 1000).toInt()
+                    val progress = (this@CookingFragment.time).toInt()
+                    progressBar.max = maxi
+                    progressBar.progress = progress
+                    textViewTimer.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue_green))
+                }
+
+            }
+            CookService.isCooking.observe(viewLifecycleOwner){
+                updateToggle(it)
             }
 
-            binding.textViewTimer.text = getFormattedTime(time)
-        }
-        CookService.isCooking.observe(viewLifecycleOwner) {
-            updateToggle(it)
         }
     }
 
@@ -136,82 +125,84 @@ class CookingFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+
         binding.apply {
 
             fabNext.setOnClickListener {
                 sendCommandToService(Constans.ACTION_STOP)
+                CookService.isWorking = false //только так пока работает
+                CookService.isCooking.value = false
                 followToNewStage()
-                isNewStage = true
             }
 
             fabPauseOrResume.setOnClickListener {
+                subscribeToObservers()
                 if (time <= 0L && CookService.isWorking) return@setOnClickListener
                 if (isCooking) {
                     sendCommandToService(Constans.ACTION_PAUSE)
+                    textViewTimer.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray_silver))
                 } else {
                     sendCommandToService(Constans.ACTION_START_RESUME)
+
                 }
             }
             fabStop.setOnClickListener {
-
                 sendCommandToService(Constans.ACTION_STOP)
                 findNavController().popBackStack()
             }
 
-            expandCollapse.setOnClickListener {
-                if (isExpanded) {
-                    collapse(rvBox)
-                    isExpanded = false
-                    it.animate().setDuration(200).rotation(180F)
-                } else {
-
-                    expand(rvBox)
-                    isExpanded = true
-                    it.animate().setDuration(200).rotation(0F)
+            fabStages.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putInt(DISH_ID_SAFE_ARG, dish.id)
+                    putInt(POS_IN_LIST_SAFE_ARG, currentPos - 1)
                 }
+                findNavController().navigate(R.id.action_cookingFragment_to_recipeStagesCookingFragment2, bundle)
             }
         }
     }
 
     private fun followToNewStage(posInList: Int = -1) {
-        if (posInList != -1) {
-            currentPos = posInList
+        currentPos++
+        if ((currentPos + 1) == stageList.size) {
+            binding.fabNext.apply {
+                isClickable = false
+                backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.black_mild))
+            }
         }
-        try {
-            currentStage = stageList[currentPos].copy()
-            stageAdapter.submitList(stageList.toList(), currentPos)
-            currentPos++
-        } catch (ex: Exception) {
-            ex.printStackTrace()
+        applyUI()
+    }
+
+    private fun applyUI() {
+        currentStage = stageList[currentPos]
+        binding.apply {
+            val assertedTime = CookService.timer.value ?: 1
+            if (assertedTime <= 0L && CookService.isWorking) {
+                binding.textViewTimer.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue_green))
+                binding.textViewFinisher.isVisible = true
+                binding.textViewTimer.text = getString(R.string.zeroTimer)
+            } else {
+                textViewFinisher.isVisible = false
+                textViewTimer.text = getFormattedTime(currentStage!!.time * 1000L)
+                progressBar.progress = 0
+                textViewTimer.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray_silver))
+            }
+            textViewName.text = currentStage?.name
         }
-        if (currentPos == stageList.size) {
-            binding.fabNext.isVisible = false
-        }
 
-        binding.textViewName.text = "Текущий этап - ".plus(currentStage?.name)
-        if (!CookService.isWorking && time <= 0) binding.textViewFinisher.isVisible = false
-
-        if (isNewStage) binding.textViewTimer.text = getFormattedTime(currentStage!!.time * 1000L)
-
-
-//        if (CookService.isWorking && time <= 0L) {
-//            binding.textViewFinisher.isVisible = true
-//            binding.textViewTimer.text = "00:00"
-//        }
 
     }
 
     private fun sendCommandToService(actionToDo: String) {
         Intent(requireContext(), CookService::class.java).apply {
             action = actionToDo
-            if (isNewStage) {
+            if (!CookService.isWorking) {
                 putExtra(Constans.KEY_DISH_ID, args.dishId)
                 putExtra(Constans.KEY_POSITION_IN_LIST, currentPos - 1)
                 putExtra(Constans.KEY_TIME, currentStage!!.time * 1000L)
-                isNewStage = false
             }
         }.also {
             requireContext().startService(it)
+            if (actionToDo == Constans.ACTION_STOP) CookService.timer.removeObservers(viewLifecycleOwner)
         }
     }
 

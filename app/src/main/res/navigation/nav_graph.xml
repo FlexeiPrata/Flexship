@@ -41,6 +41,9 @@
             android:name="posInList"
             app:argType="integer"
             android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_cookingFragment_to_recipeStagesCookingFragment2"
+            app:destination="@id/recipeStagesCookingFragment2" />
     </fragment>
     <fragment
         android:id="@+id/dishFragment"
@@ -78,5 +81,17 @@
         <action
             android:id="@+id/action_recipeListFragment_to_cookingFragment"
             app:destination="@id/cookingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recipeStagesCookingFragment2"
+        android:name="com.flexship.flexshipcookingass.ui.fragments.RecipeStagesCookingFragment"
+        android:label="fragment_recipe_stages_cooking"
+        tools:layout="@layout/fragment_recipe_stages_cooking" >
+        <argument
+            android:name="dishId"
+            app:argType="integer" />
+        <argument
+            android:name="posInList"
+            app:argType="integer" />
     </fragment>
 </navigation>

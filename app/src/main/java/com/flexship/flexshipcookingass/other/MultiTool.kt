@@ -16,58 +16,12 @@ import kotlin.math.roundToInt
 
 const val DATABASE_NAME = "cook_database"
 const val DISH_ID_SAFE_ARG = "dishId"
+const val POS_IN_LIST_SAFE_ARG = "posInList"
 const val MINUTES = "MINUTES"
 const val CATEGORY_ID = "categoryId"
 const val LOG_ID = "MyLog"
 const val TITLE = "Title"
 const val MESSAGE = "Message"
-
-fun expandAction(view: View, height: Int) {
-    view.measure(ViewGroup.LayoutParams.MATCH_PARENT, height)
-    val actualHeight = view.measuredHeight
-    view.layoutParams.height = 0
-    view.visibility = View.VISIBLE
-    val animation: Animation = object : Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-            view.layoutParams.height =
-                if (interpolatedTime == 1f) height else (actualHeight * interpolatedTime).toInt()
-            view.requestLayout()
-        }
-    }
-    animation.duration = (actualHeight / view.context.resources.displayMetrics.density).toLong() * 2
-    view.startAnimation(animation)
-}
-
-fun expand(view: View) {
-    view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    val actualHeight = view.measuredHeight
-    view.layoutParams.height = 0
-    view.visibility = View.VISIBLE
-    val animation: Animation = object : Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-            view.layoutParams.height =
-                if (interpolatedTime == 1f) ViewGroup.LayoutParams.WRAP_CONTENT else (actualHeight * interpolatedTime).toInt()
-            view.requestLayout()
-        }
-    }
-    animation.duration = (actualHeight / view.context.resources.displayMetrics.density).toLong() * 4
-    view.startAnimation(animation)
-}
-
-fun collapse(view: View) {
-    val actualHeight = view.measuredHeight
-    val animation: Animation = object : Animation() {
-        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
-            if (interpolatedTime == 1f) view.visibility = View.GONE else {
-                view.layoutParams.height = actualHeight - (actualHeight * interpolatedTime).toInt()
-                view.requestLayout()
-            }
-        }
-    }
-    animation.duration = (actualHeight / view.context.resources.displayMetrics.density).toLong() * 2
-    view.startAnimation(animation)
-}
-
 
 
 //функция для того чтобы спрятать Soft Keyboard из не активити

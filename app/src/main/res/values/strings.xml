@@ -45,4 +45,8 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="stages">Список стадий\nРецепт</string>
+    <string name="stage_finished">Этап завершён</string>
+    <string name="zeroTimer">00:00</string>
+    <string name="dish_stages">Стадии приготовления</string>
 </resources>

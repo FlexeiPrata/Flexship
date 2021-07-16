@@ -27,6 +27,7 @@ import com.flexship.flexshipcookingass.other.LOG_ID
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 @AndroidEntryPoint
 class CookService : LifecycleService() {
@@ -51,7 +52,6 @@ class CookService : LifecycleService() {
                         timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
                         currentDishId = it.getIntExtra(KEY_DISH_ID, 0)
                         posInList = it.getIntExtra(KEY_POSITION_IN_LIST, 0)
-                        Log.d(LOG_ID, "On start time = $timeToCook")
                         startForegroundService()
                     } else {
                         runTimer()
@@ -103,20 +103,25 @@ class CookService : LifecycleService() {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
-            isAccessible = true
-            set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
+        try {
+            currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
+                isAccessible = true
+                set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
+            }
+            if (!isCanceled) {
+                currentNotificationBuilder = notificationBuilder
+                    .addAction(R.drawable.ic_pause, notText, pendingIntent)
+                notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
+            }
         }
-        if (!isCanceled) {
-            currentNotificationBuilder = notificationBuilder
-                .addAction(R.drawable.ic_pause, notText, pendingIntent)
-            notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
+        catch (ex : Exception){
+            ex.printStackTrace()
         }
     }
 
 
     companion object {
-        val isCooking = MutableLiveData<Boolean>()
+        var isCooking = MutableLiveData<Boolean>()
         val timer = MutableLiveData<Long>()
         var isWorking = false
         var currentDishId = 0
@@ -133,8 +138,10 @@ class CookService : LifecycleService() {
         isTimerEnabled = true
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
-                timeToCook -= 1000L
-                timer.postValue(timeToCook)
+                timeToCook -= Constans.DELAY_FOR_TIMER
+                timer.value = timeToCook
+                //PostValue по какой-то причине сбивал таймер в уведомлении, он показывал 00:09 - 00:08 - 00:06 и тд
+                //Так, как сейчас он вроде работает правильно
                 if (timeToCook <= 0L)
                     pauseService()
                 delay(Constans.DELAY_FOR_TIMER)
