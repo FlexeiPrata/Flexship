@@ -79,13 +79,18 @@ class CookService : LifecycleService() {
 
 
         isCooking.observe(this) {
-            updateNotification(it)
+            if(isWorking){
+                updateNotification(it)
+            }
         }
     }
 
     private fun updateNotification(isCooking: Boolean) {
         val notText = if (isCooking)
+        {
+            Log.d(LOG_ID,"UPDATE")
             "Pause"
+        }
         else
             "Resume"
         val pendingIntent = if (isCooking) {
@@ -103,19 +108,14 @@ class CookService : LifecycleService() {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        try {
-            currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
-                isAccessible = true
-                set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
-            }
-            if (!isCanceled) {
-                currentNotificationBuilder = notificationBuilder
-                    .addAction(R.drawable.ic_pause, notText, pendingIntent)
-                notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
-            }
+        currentNotificationBuilder.javaClass.getDeclaredField("mActions").apply {
+            isAccessible = true
+            set(currentNotificationBuilder, ArrayList<NotificationCompat.Action>())
         }
-        catch (ex : Exception){
-            ex.printStackTrace()
+        if (!isCanceled) {
+            currentNotificationBuilder = notificationBuilder
+                .addAction(R.drawable.ic_pause, notText, pendingIntent)
+            notificationManager.notify(NOTIFICATION_ID, currentNotificationBuilder.build())
         }
     }
 
@@ -130,7 +130,7 @@ class CookService : LifecycleService() {
 
     private fun postInitialValues() {
         isCooking.postValue(false)
-        //timer.postValue(0L)
+        timer.postValue(0L)
     }
 
     private fun runTimer() {
@@ -153,7 +153,7 @@ class CookService : LifecycleService() {
 
         isFirstCooking = false
         isWorking = true
-        postInitialValues()
+        //postInitialValues()
 
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -177,12 +177,16 @@ class CookService : LifecycleService() {
 
         timer.observe(this) { time ->
             val notification = if (time > 0L)
+            {
                 currentNotificationBuilder.setContentText(
-                "${zeroOrNotZero(time / 1000 / 60)}:${zeroOrNotZero(time / 1000 % 60)}"
-            )
-            else currentNotificationBuilder.setContentText(
-                getString(R.string.notification_finished)
-            )
+                    "${zeroOrNotZero(time / 1000 / 60)}:${zeroOrNotZero(time / 1000 % 60)}"
+                )
+            }
+            else {
+                currentNotificationBuilder.setContentText(
+                    getString(R.string.notification_finished)
+                )
+            }
             notificationManager.notify(NOTIFICATION_ID, notification.build())
         }
 
@@ -212,9 +216,12 @@ class CookService : LifecycleService() {
 
 
     private fun cancelService() {
+
         if(isWorking){
             isWorking = false
             isCanceled = true
+            timer.removeObservers(this)
+            isCooking.removeObservers(this)
             postInitialValues()
             stopForeground(true)
         }
