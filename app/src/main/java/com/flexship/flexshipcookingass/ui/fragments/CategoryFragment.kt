@@ -55,7 +55,7 @@ class CategoryFragment : Fragment(), CategoryAdapter.OnCategoryClick {
         }
 
         (requireActivity() as MainActivity).supportActionBar?.apply {
-            title="Категории"
+            title = getString(R.string.category)
             setDisplayHomeAsUpEnabled(false)
         }
 

@@ -16,7 +16,8 @@
         android:src="@drawable/ra_stage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:focusable="true" />
 
 
     <TextView
@@ -54,7 +55,8 @@
         android:clickable="true"
         android:src="@drawable/ic_baseline_stop_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:focusable="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabPauseOrResume"
@@ -65,7 +67,8 @@
         android:src="@drawable/ic_baseline_play_arrow_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fabNext"
-        app:layout_constraintStart_toEndOf="@+id/fabStop" />
+        app:layout_constraintStart_toEndOf="@+id/fabStop"
+        android:focusable="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabNext"
@@ -76,7 +79,8 @@
         android:clickable="true"
         android:src="@drawable/ic_baseline_skip_next_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:focusable="true" />
 
     <ProgressBar
         android:id="@+id/progressBar"

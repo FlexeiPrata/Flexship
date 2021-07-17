@@ -6,9 +6,9 @@ import androidx.room.TypeConverters
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
 
-@Database(entities = arrayOf(Dish::class,Stages::class),version = 1,exportSchema = false)
+@Database(entities = arrayOf(Dish::class, Stages::class), version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
-abstract class CookDatabase:RoomDatabase() {
+abstract class CookDatabase : RoomDatabase() {
 
-    abstract fun provideCookDao() : CookDao
+    abstract fun provideCookDao(): CookDao
 }

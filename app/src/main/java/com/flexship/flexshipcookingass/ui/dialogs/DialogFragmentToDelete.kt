@@ -9,17 +9,17 @@ import com.flexship.flexshipcookingass.other.TITLE
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class DialogFragmentToDelete
-: DialogFragment() {
+    : DialogFragment() {
 
-    private var actionToDelete : (()->Unit) ?= null
+    private var actionToDelete: (() -> Unit)? = null
 
 
-    fun setAction(action: (()->Unit)){
+    fun setAction(action: (() -> Unit)) {
         actionToDelete = action
     }
 
     companion object {
-        fun newInstance(title: String, message: String) : DialogFragmentToDelete {
+        fun newInstance(title: String, message: String): DialogFragmentToDelete {
             val args = Bundle().apply {
                 putString(TITLE, title)
                 putString(MESSAGE, message)
@@ -34,10 +34,10 @@ class DialogFragmentToDelete
         return MaterialAlertDialogBuilder(requireContext())
             .setMessage(arguments?.getString(TITLE) ?: "")
             .setTitle(arguments?.getString(MESSAGE) ?: "")
-            .setPositiveButton(R.string.yes){_ ,_ ->
+            .setPositiveButton(R.string.yes) { _, _ ->
                 actionToDelete?.invoke()
             }
-            .setNegativeButton(R.string.no){dial, _ ->
+            .setNegativeButton(R.string.no) { dial, _ ->
                 dial.dismiss()
 
             }

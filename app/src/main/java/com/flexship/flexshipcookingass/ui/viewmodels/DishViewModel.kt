@@ -1,9 +1,9 @@
 package com.flexship.flexshipcookingass.ui.viewmodels
 
 import androidx.lifecycle.*
-import com.flexship.flexshipcookingass.ui.other.CookRepository
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
+import com.flexship.flexshipcookingass.ui.other.CookRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,28 +14,23 @@ class DishViewModel @Inject constructor(
     val cookRepository: CookRepository
 ) : ViewModel() {
 
-    val _stageList = MutableLiveData<MutableList<Stages>>()
+    val mutableStageList = MutableLiveData<MutableList<Stages>>()
 
-    //val stageList: LiveData<MutableList<Stages>> = _stageList
-    val stageList get() = _stageList as LiveData<MutableList<Stages>>
+    val stageList get() = mutableStageList as LiveData<MutableList<Stages>>
 
     val bufferStageList = mutableListOf<Stages>()
 
     var stageToEdit: Stages? = null
-    var posToEdit:Int = -1
+    var posToEdit: Int = -1
 
     var isUpdated = false
-    var isSaved = false
     var isNewDish: Boolean = true
-    var isInserted: Boolean = false
     var isChangedConfig: Boolean = false
     var isStageEdit = false
     var isBuffer = false
 
-    val lastIDLiveData = cookRepository.getMaxIdOfStage().asLiveData()
-
     fun postEmptyValues() {
-        _stageList.postValue(mutableListOf())
+        mutableStageList.postValue(mutableListOf())
     }
 
     fun insertDish(dish: Dish) = viewModelScope.launch(Dispatchers.IO) {

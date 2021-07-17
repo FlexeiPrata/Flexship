@@ -10,14 +10,14 @@ import com.flexship.flexshipcookingass.databinding.NumberPickerBinding
 import com.flexship.flexshipcookingass.other.MINUTES
 
 
-class MinutePickerDialog: DialogFragment() {
+class MinutePickerDialog : DialogFragment() {
 
     private var timeSec: Int = 0
     private var timeMin: Int = 0
-    private var actionPickMinutes: ((Int)->Unit) ?= null
+    private var actionPickMinutes: ((Int) -> Unit)? = null
     private lateinit var binding: NumberPickerBinding
 
-    fun setAction(action : ((Int)->Unit)) {
+    fun setAction(action: ((Int) -> Unit)) {
         actionPickMinutes = action
     }
 
@@ -26,7 +26,7 @@ class MinutePickerDialog: DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.number_picker, container,false)
+        val view = inflater.inflate(R.layout.number_picker, container, false)
 
         binding = NumberPickerBinding.bind(view)
 

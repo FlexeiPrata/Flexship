@@ -24,9 +24,6 @@ interface CookDao {
     @Delete
     suspend fun deleteDish(dish: Dish)
 
-//    @Delete
-//    suspend fun deleteNotSavedStages(stages: List<Stages>)
-
     @Query("SELECT * FROM dish_table")
     fun getDishes(): Flow<List<Dish>>
 
@@ -42,7 +39,6 @@ interface CookDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateStage(stage: Stages)
 
-    //получаем лист стадий по ID
     @Transaction
     @Query("SELECT * FROM dish_table where id = :dishId")
     fun getDishWithStages(dishId: Int): Flow<DishWithStages>

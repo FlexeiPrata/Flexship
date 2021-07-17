@@ -1,11 +1,10 @@
 package com.flexship.flexshipcookingass.di
 
-import android.app.PendingIntent
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import com.flexship.flexshipcookingass.db.CookDatabase
-import com.flexship.flexshipcookingass.other.Constans
+import com.flexship.flexshipcookingass.other.Constants
 import com.flexship.flexshipcookingass.other.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
@@ -21,7 +20,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabase(
-        @ApplicationContext context:Context
+        @ApplicationContext context: Context
     ) = Room.databaseBuilder(
         context,
         CookDatabase::class.java,
@@ -39,9 +38,7 @@ object AppModule {
     @Singleton
     fun provideSharedPreferences(
         @ApplicationContext context: Context
-    ) = context.getSharedPreferences(Constans.SHARED_PREF_NAME,Context.MODE_PRIVATE)
-
-
+    ): SharedPreferences = context.getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
 
 
 }

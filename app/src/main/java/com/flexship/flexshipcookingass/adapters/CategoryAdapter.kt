@@ -30,8 +30,10 @@ class CategoryAdapter(
         return differ.currentList.size
     }
 
-    inner class ViewHolderData(itemView: View) : RecyclerView.ViewHolder(itemView),View.OnClickListener {
+    inner class ViewHolderData(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
         private val binding = CategoryItemBinding.bind(itemView)
+
         init {
             itemView.setOnClickListener(this)
         }
@@ -59,7 +61,7 @@ class CategoryAdapter(
 
     val differ = AsyncListDiffer(this, diffUtil)
 
-    interface OnCategoryClick{
-        fun onCategoryClicked(categoryId:Int)
+    interface OnCategoryClick {
+        fun onCategoryClicked(categoryId: Int)
     }
 }

@@ -45,8 +45,8 @@ class CookingFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if(args.posInList!=-1)
-            currentPos=args.posInList
+        if (args.posInList != -1)
+            currentPos = args.posInList
         Log.d(LOG_ID, currentPos.toString())
     }
 
@@ -63,7 +63,7 @@ class CookingFragment : Fragment() {
             }
             subscribeToObservers()
             (requireActivity() as MainActivity).supportActionBar?.apply {
-                title = "Блюдо : ${dish.name}"
+                title = String.format(getString(R.string.meal), dish.name)
             }
         }
         if (CookService.isWorking) {
@@ -81,8 +81,6 @@ class CookingFragment : Fragment() {
         CookService.timer.observe(viewLifecycleOwner) { time ->
             this.time = time
             binding.textViewFinisher.isVisible = time <= 0L && !isNewStage
-
-
             binding.apply {
                 if (time != 0L) {
                     textViewTimer.text = getFormattedTime(time)
@@ -133,10 +131,7 @@ class CookingFragment : Fragment() {
         binding.apply {
 
             fabNext.setOnClickListener {
-                sendCommandToService(Constans.ACTION_STOP)
-//                Log.d(LOG_ID,"HUI")
-//                CookService.isWorking = false //только так пока работает
-//                CookService.isCooking.postValue(false)
+                sendCommandToService(Constants.ACTION_STOP)
                 isNewStage = true
                 followToNewStage()
             }
@@ -145,7 +140,7 @@ class CookingFragment : Fragment() {
                 subscribeToObservers()
                 if (time <= 0L && CookService.isWorking) return@setOnClickListener
                 if (isCooking) {
-                    sendCommandToService(Constans.ACTION_PAUSE)
+                    sendCommandToService(Constants.ACTION_PAUSE)
                     textViewTimer.setTextColor(
                         ContextCompat.getColor(
                             requireContext(),
@@ -153,12 +148,12 @@ class CookingFragment : Fragment() {
                         )
                     )
                 } else {
-                    sendCommandToService(Constans.ACTION_START_RESUME, true)
+                    sendCommandToService(Constants.ACTION_START_RESUME, true)
 
                 }
             }
             fabStop.setOnClickListener {
-                sendCommandToService(Constans.ACTION_STOP)
+                sendCommandToService(Constants.ACTION_STOP)
                 findNavController().popBackStack()
             }
 
@@ -228,14 +223,14 @@ class CookingFragment : Fragment() {
         Intent(requireContext(), CookService::class.java).apply {
             action = actionToDo
             if (isNewStage && postData) {
-                putExtra(Constans.KEY_DISH_ID, args.dishId)
-                putExtra(Constans.KEY_POSITION_IN_LIST, currentPos - 1)
-                putExtra(Constans.KEY_TIME, currentStage!!.time * 1000L)
+                putExtra(Constants.KEY_DISH_ID, args.dishId)
+                putExtra(Constants.KEY_POSITION_IN_LIST, currentPos - 1)
+                putExtra(Constants.KEY_TIME, currentStage!!.time * 1000L)
                 isNewStage = false
             }
         }.also {
             requireContext().startService(it)
-            if (actionToDo == Constans.ACTION_STOP) CookService.timer.removeObservers(
+            if (actionToDo == Constants.ACTION_STOP) CookService.timer.removeObservers(
                 viewLifecycleOwner
             )
         }

@@ -23,9 +23,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="sans-serif-light"
-        android:text="TextView"
+        tools:text="Имя категории"
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/category_image"
         app:layout_constraintStart_toEndOf="@+id/category_image"
         app:layout_constraintTop_toTopOf="@+id/category_image" />

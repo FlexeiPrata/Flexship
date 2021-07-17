@@ -1,13 +1,12 @@
 package com.flexship.flexshipcookingass.ui.other
 
-import androidx.lifecycle.asLiveData
 import com.flexship.flexshipcookingass.db.CookDao
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
 import javax.inject.Inject
 
 class CookRepository @Inject constructor(
-    val cookDao: CookDao
+    private val cookDao: CookDao
 ) {
 
     suspend fun insertDish(dish: Dish) = cookDao.insertDish(dish)
@@ -28,12 +27,7 @@ class CookRepository @Inject constructor(
 
     fun getDishWithStages(dishId: Int) = cookDao.getDishWithStages(dishId)
 
-    fun getDishesByCategorySortedByName(category: Int) =
-        cookDao.getDishesByCategorySortedByName(category)
-
     fun getMaxIdDish() = cookDao.getNewDish()
-
-    fun getDishes() = cookDao.getDishes()
 
     suspend fun deleteStage(stages: Stages) = cookDao.deleteStage(stages)
 

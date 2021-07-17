@@ -1,8 +1,8 @@
 package com.flexship.flexshipcookingass.other
 
-object Constans {
+object Constants {
 
-    const val DATABASE_NAME = "cook_database"
+
     const val SHARED_PREF_NAME = "PREFS"
     const val TAG_DIALOG_DELETE = "TAG_DIALOG_DELETE"
     const val TAG_MINUTE_PICKER = "TAG_MINUTE_PICKER"
@@ -18,7 +18,6 @@ object Constans {
     const val KEY_DISH_ID = "KEY_DISH_ID"
     const val KEY_TIME = "KEY_TIME"
     const val KEY_POSITION_IN_LIST="KEY_POSITION_IN_LIST"
-    const val KEY_BUF_LIST="KEY_BUF_LIST"
     const val KEY_BITMAP="KEY_BITMAP"
     const val KEY_TIME_SEC="KEY_TIME_SEC"
     const val KEY_DISH="KEY_DISH"
@@ -33,8 +32,5 @@ object Constans {
     const val NOTIFICATION_CHANNEL_NAME = "Cooking"
     const val NOTIFICATION_ID = 1
 
-    //Баги
-    //При паузе прога не знает если блюдо уже готовится
-    //уведомление иногда показывает 00:00, иногда "Этап завершён"
 
 }

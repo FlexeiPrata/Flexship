@@ -3,10 +3,10 @@
 
     <item
         android:id="@+id/take_photo"
-        android:title="Камера"
+        android:title="@string/from_camera"
         android:icon="@drawable/ic_camera"/>
     <item
         android:icon="@drawable/ic_gallery"
-        android:title="Галерея"
+        android:title="@string/gallery"
         android:id="@+id/get_photo"/>
 </menu>

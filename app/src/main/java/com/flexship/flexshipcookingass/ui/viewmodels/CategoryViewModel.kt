@@ -9,7 +9,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
     val cookRepository: CookRepository
-): ViewModel() {
-
+) : ViewModel() {
     val categoriesID = cookRepository.getAllCategories().asLiveData()
 }

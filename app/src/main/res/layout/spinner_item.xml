@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/spinner_image"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
@@ -21,9 +21,9 @@
         android:id="@+id/spinner_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:fontFamily="sans-serif-light"
-        android:text="TextView"
+        tools:text="Имя категории"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="@+id/spinner_image"
         app:layout_constraintStart_toEndOf="@+id/spinner_image"

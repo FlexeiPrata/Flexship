@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Flexship Cooking Ass</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dish_title_hint">Название блюда</string>
     <string name="stage_title_hint">Название этапа готовки</string>
@@ -22,8 +21,8 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="notification_finished">Этап завершён</string>
-    <string name="dialog_del_title">Не сохраненные данные</string>
-    <string name="dialog_del_mes">У вас присутствуют не сохраненные данные.Все несохраненные данные будут утерены.Желаете продолжить?</string>
+    <string name="dialog_del_title">Несохранённые данные</string>
+    <string name="dialog_del_mes">У вас присутствуют не сохраненные данные. Все несохраненные данные будут утерены. Вы уверены, что хотите продолжить?</string>
     <string name="dialog_del_dish_title">Удаление блюда</string>
     <string name="dialog_del_dish_mes">Вы действительно хотите удалить данное блюдо?</string>
     <string name="dish_title">Блюдо: %s</string>
@@ -49,4 +48,35 @@
     <string name="stage_finished">Этап завершён</string>
     <string name="zeroTimer">00:00</string>
     <string name="dish_stages">Стадии приготовления</string>
+    <string name="currentlyCooking">Идёт приготовление</string>
+    <string name="pause">Пауза</string>
+    <string name="continue_string">Продолжить</string>
+    <string name="meal">Блюдо: %s</string>
+    <string name="update">Обновить</string>
+    <string name="new_meal">Новое блюдо</string>
+    <string name="stage_name_snackbar">Введите название этапа</string>
+    <string name="specify_time">Укажите время</string>
+    <string name="add">Добавить</string>
+    <string name="update_stage">Обновить стадию</string>
+    <string name="stage_has_been_deleted">Стадия удалена</string>
+    <string name="undo">Отменить</string>
+    <string name="soup">Супы</string>
+    <string name="snacks">Закуски</string>
+    <string name="salads">Салаты</string>
+    <string name="pizza">Пиццы и пасты</string>
+    <string name="main_meal">Горячие блюда</string>
+    <string name="breakfast">Завтраки</string>
+    <string name="sweets">Десерты и сладости</string>
+    <string name="enter_dish">Введите название и рецепт блюда</string>
+    <string name="image">Изображение блюда</string>
+    <string name="alert_image">Вы не выбрали изображение для блюда. Вы действительно хотите продолжить без изображения блюда?</string>
+    <string name="stages_miss">Отсутствуют этапы</string>
+    <string name="alert_stages_miss">У вас отсутствуют этапы готовки. Вы действительно хотите продолжить без этапов готовки?</string>
+    <string name="enter_dish_name">Введите имя блюда</string>
+    <string name="handling_permissions">Разрешения</string>
+    <string name="handling_permissions_message">Разрешите приложению считывать хранилище и использовать камеру, чтобы выбирать изображение для блюда</string>
+    <string name="new_picture">Новое изображение</string>
+    <string name="from_camera">Камера</string>
+    <string name="dish_has_been_deleted">Блюдо было удалено</string>
+    <string name="gallery">Галерея</string>
 </resources>

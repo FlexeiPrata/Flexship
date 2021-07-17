@@ -12,6 +12,5 @@ data class Dish(
     val name: String = "",
     val recipe: String = "",
     @ColumnInfo(name = "category") val category: Int = 0,
-    val image: Bitmap? = null,
-    @ColumnInfo(name = "position_in_list") val positionInList: Int = 0
+    val image: Bitmap? = null
 ) :Serializable

@@ -1,19 +1,15 @@
 package com.flexship.flexshipcookingass.adapters
 
 import android.content.Context
-import android.text.format.DateFormat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.flexship.flexshipcookingass.R
 import com.flexship.flexshipcookingass.databinding.StageAdapterBinding
 import com.flexship.flexshipcookingass.helpers.DragAndDropSwappable
 import com.flexship.flexshipcookingass.models.Stages
-import com.flexship.flexshipcookingass.other.LOG_ID
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 
 class StageAdapter(
@@ -49,8 +45,7 @@ class StageAdapter(
                     context.getString(R.string.timer), zeroOrNotZero(stages.time / 60),
                     zeroOrNotZero(stages.time % 60)
                 )
-            }
-            else {
+            } else {
                 stageTime.visibility = View.GONE
                 imageView4.visibility = View.GONE
             }
@@ -60,9 +55,6 @@ class StageAdapter(
             else imageView3.setImageResource(R.drawable.ra_stage)
         }
 
-        override fun onItemSelected() {
-
-        }
 
         override fun onItemClear() {
 
@@ -78,14 +70,7 @@ class StageAdapter(
 
     }
 
-
-  /*private val diffUtil = object : DiffUtil.ItemCallback<Stages>() {
-        override fun areItemsTheSame(oldItem: Stages, newItem: Stages): Boolean = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: Stages, newItem: Stages): Boolean = oldItem == newItem
-    }
-    val differ = AsyncListDiffer(this, diffUtil)*/
-
-   inner class StageItemDiffCallback(
+    inner class StageItemDiffCallback(
         var oldList: List<Stages>,
         var newList: List<Stages>
     ) : DiffUtil.Callback() {
@@ -107,10 +92,10 @@ class StageAdapter(
 
     }
 
-    fun submitList(stageList: List<Stages>, currentStage : Int = -1) {
+    fun submitList(stageList: List<Stages>, currentStage: Int = -1) {
         val oldList = ArrayList(items)
         this.currentStage = currentStage
-        Log.d(LOG_ID, "Current stage = ${this.currentStage}")
+
         if (currentStage != -1) notifyDataSetChanged()
 
         val diffResult: DiffUtil.DiffResult = DiffUtil.calculateDiff(
@@ -118,7 +103,6 @@ class StageAdapter(
         )
         items = stageList.toMutableList()
         diffResult.dispatchUpdatesTo(this)
-
 
 
     }

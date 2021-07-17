@@ -13,7 +13,7 @@ import com.flexship.flexshipcookingass.other.convertDpToPx
 import com.flexship.flexshipcookingass.other.drawableToBitmap
 
 abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHelper.SimpleCallback(
-    ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+    0,
     ItemTouchHelper.RIGHT or ItemTouchHelper.LEFT
 ) {
     //Целевой ViewHolder должен реализовывать интерфейс DragAndDropSwappable.ItemDragDropMoveViewHolder
@@ -32,30 +32,9 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
 
 
     interface ItemDragDropMoveViewHolder {
-        fun onItemSelected() //При начале передвижения
         fun onItemClear() //При окончании передвижения
         fun onItemDelete() //При удалении, здесь необходимо реализовать сохранение в базе данных
         fun onItemEdit() //При редактировании, здесь необходимо реализовать сохранение в базе данных
-    }
-
-    override fun clearView(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
-    ) {
-        saveInDatabase()
-        if (viewHolder is ItemDragDropMoveViewHolder) {
-            viewHolder.onItemClear()
-        }
-        super.clearView(recyclerView, viewHolder)
-    }
-
-    override fun isLongPressDragEnabled(): Boolean = true
-
-    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder is ItemDragDropMoveViewHolder) {
-            viewHolder.onItemSelected()
-        }
-        super.onSelectedChanged(viewHolder, actionState)
     }
 
     override fun onMove(
@@ -63,13 +42,19 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        val startPosition = viewHolder.adapterPosition
-        val targetPosition = target.adapterPosition
-        swapList(startPosition, targetPosition)
-        recyclerView.adapter?.notifyItemMoved(startPosition, targetPosition)
-
         return true
     }
+
+    override fun clearView(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder
+    ) {
+        if (viewHolder is ItemDragDropMoveViewHolder) {
+            viewHolder.onItemClear()
+        }
+        super.clearView(recyclerView, viewHolder)
+    }
+
 
     override fun onChildDraw(
         c: Canvas,
@@ -88,7 +73,7 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
             dY,
             actionState,
             isCurrentlyActive
-        ) //передвижение элемента
+        )
 
         val itemView: View = viewHolder.itemView
 
@@ -116,14 +101,6 @@ abstract class DragAndDropSwappable(private val context: Context) : ItemTouchHel
             )
         }
     }
-
-
-    //изменение представляемого списка каждый раз, когда элемент меняет позицию
-    abstract fun swapList(startPosition: Int, targetPosition: Int)
-
-    //сохранение списка в базе данных после того, как элемент отпущен
-    //Можно оставить пустым и пользоваться viewHolder.onItemClear()
-    abstract fun saveInDatabase()
 
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {

@@ -1,17 +1,14 @@
 package com.flexship.flexshipcookingass.ui.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.flexship.flexshipcookingass.R
-import com.flexship.flexshipcookingass.adapters.DishAdapter
 import com.flexship.flexshipcookingass.adapters.StageAdapter
-import com.flexship.flexshipcookingass.databinding.FragmentDishBinding
 import com.flexship.flexshipcookingass.databinding.FragmentRecipeStagesCookingBinding
 import com.flexship.flexshipcookingass.models.Dish
 import com.flexship.flexshipcookingass.models.Stages
@@ -52,14 +49,14 @@ class RecipeStagesCookingFragment : Fragment() {
     }
 
     private fun updateUI() {
-       binding.apply {
-           recycler.apply {
-               layoutManager = LinearLayoutManager(context)
-               adapter = StageAdapter(context).also {
-                   it.submitList(stageList, args.posInList + 1)
-               }
-           }
-           textViewRecipe.text = dish.recipe
-       }
+        binding.apply {
+            recycler.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = StageAdapter(context).also {
+                    it.submitList(stageList, args.posInList + 1)
+                }
+            }
+            textViewRecipe.text = dish.recipe
+        }
     }
 }

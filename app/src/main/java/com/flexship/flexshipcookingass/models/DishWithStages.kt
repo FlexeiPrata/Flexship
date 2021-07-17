@@ -10,5 +10,5 @@ data class DishWithStages(
         parentColumn = "id",
         entityColumn = "dishId"
     )
-    val stages:List<Stages>
+    val stages: List<Stages>
 )

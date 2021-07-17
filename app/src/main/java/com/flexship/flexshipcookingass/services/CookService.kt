@@ -6,28 +6,28 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
-import com.flexship.flexshipcookingass.ui.other.MainActivity
 import com.flexship.flexshipcookingass.R
-import com.flexship.flexshipcookingass.other.Constans
-import com.flexship.flexshipcookingass.other.Constans.ACTION_PAUSE
-import com.flexship.flexshipcookingass.other.Constans.ACTION_PENDING_INTENT
-import com.flexship.flexshipcookingass.other.Constans.ACTION_START_RESUME
-import com.flexship.flexshipcookingass.other.Constans.ACTION_STOP
-import com.flexship.flexshipcookingass.other.Constans.KEY_DISH_ID
-import com.flexship.flexshipcookingass.other.Constans.KEY_POSITION_IN_LIST
-import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_ID
-import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_CHANNEL_NAME
-import com.flexship.flexshipcookingass.other.Constans.NOTIFICATION_ID
-import com.flexship.flexshipcookingass.other.LOG_ID
+import com.flexship.flexshipcookingass.other.Constants
+import com.flexship.flexshipcookingass.other.Constants.ACTION_PAUSE
+import com.flexship.flexshipcookingass.other.Constants.ACTION_PENDING_INTENT
+import com.flexship.flexshipcookingass.other.Constants.ACTION_START_RESUME
+import com.flexship.flexshipcookingass.other.Constants.ACTION_STOP
+import com.flexship.flexshipcookingass.other.Constants.KEY_DISH_ID
+import com.flexship.flexshipcookingass.other.Constants.KEY_POSITION_IN_LIST
+import com.flexship.flexshipcookingass.other.Constants.NOTIFICATION_CHANNEL_ID
+import com.flexship.flexshipcookingass.other.Constants.NOTIFICATION_CHANNEL_NAME
+import com.flexship.flexshipcookingass.other.Constants.NOTIFICATION_ID
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
+import com.flexship.flexshipcookingass.ui.other.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
-import java.lang.Exception
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CookService : LifecycleService() {
@@ -49,7 +49,7 @@ class CookService : LifecycleService() {
             when (it.action) {
                 ACTION_START_RESUME -> {
                     if (isFirstCooking) {
-                        timeToCook = it.getLongExtra(Constans.KEY_TIME, 0)
+                        timeToCook = it.getLongExtra(Constants.KEY_TIME, 0)
                         currentDishId = it.getIntExtra(KEY_DISH_ID, 0)
                         posInList = it.getIntExtra(KEY_POSITION_IN_LIST, 0)
                         startForegroundService()
@@ -79,20 +79,17 @@ class CookService : LifecycleService() {
 
 
         isCooking.observe(this) {
-            if(isWorking){
+            if (isWorking) {
                 updateNotification(it)
             }
         }
     }
 
     private fun updateNotification(isCooking: Boolean) {
-        val notText = if (isCooking)
-        {
-            Log.d(LOG_ID,"UPDATE")
-            "Pause"
-        }
-        else
-            "Resume"
+        val notText = if (isCooking) {
+            getString(R.string.pause)
+        } else
+            getString(R.string.continue_string)
         val pendingIntent = if (isCooking) {
             val pauseIntent = Intent(this, CookService::class.java).apply {
                 action = ACTION_PAUSE
@@ -138,13 +135,11 @@ class CookService : LifecycleService() {
         isTimerEnabled = true
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
-                timeToCook -= Constans.DELAY_FOR_TIMER
+                timeToCook -= Constants.DELAY_FOR_TIMER
                 timer.value = timeToCook
-                //PostValue по какой-то причине сбивал таймер в уведомлении, он показывал 00:09 - 00:08 - 00:06 и тд
-                //Так, как сейчас он вроде работает правильно
                 if (timeToCook <= 0L)
                     pauseService()
-                delay(Constans.DELAY_FOR_TIMER)
+                delay(Constants.DELAY_FOR_TIMER)
             }
         }
     }
@@ -154,7 +149,6 @@ class CookService : LifecycleService() {
         isFirstCooking = false
         isWorking = true
         //postInitialValues()
-
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -165,8 +159,8 @@ class CookService : LifecycleService() {
             .setAutoCancel(true)
             .setOngoing(true)
             .setSmallIcon(R.drawable.breakfast)
-            .setContentTitle("Currently cooking")
-            .setContentText("00:00")
+            .setContentTitle(getString(R.string.currentlyCooking))
+            .setContentText(getString(R.string.zeroTimer))
             .setContentIntent(getPendingIntent())
 
         currentNotificationBuilder = notificationBuilder
@@ -176,13 +170,11 @@ class CookService : LifecycleService() {
         startForeground(NOTIFICATION_ID, notificationBuilder.build())
 
         timer.observe(this) { time ->
-            val notification = if (time > 0L)
-            {
+            val notification = if (time > 0L) {
                 currentNotificationBuilder.setContentText(
                     "${zeroOrNotZero(time / 1000 / 60)}:${zeroOrNotZero(time / 1000 % 60)}"
                 )
-            }
-            else {
+            } else {
                 currentNotificationBuilder.setContentText(
                     getString(R.string.notification_finished)
                 )
@@ -217,7 +209,7 @@ class CookService : LifecycleService() {
 
     private fun cancelService() {
 
-        if(isWorking){
+        if (isWorking) {
             isWorking = false
             isCanceled = true
             timer.removeObservers(this)
