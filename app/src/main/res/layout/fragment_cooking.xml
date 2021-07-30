@@ -25,6 +25,7 @@
         style="@style/MaterialTextViewSemiAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/gray_silver"
         android:textSize="90sp"
         app:layout_constraintBottom_toBottomOf="@+id/progressBar"
         app:layout_constraintEnd_toEndOf="@+id/progressBar"

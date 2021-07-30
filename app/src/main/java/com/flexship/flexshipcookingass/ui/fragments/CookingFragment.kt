@@ -37,7 +37,7 @@ class CookingFragment : Fragment() {
 
 
     private var currentStage: Stages? = null
-    private var currentPos: Int = -1
+    private var currentPos: Int = 0
 
     private var isNewStage = true
     private var isCooking = false
@@ -59,7 +59,7 @@ class CookingFragment : Fragment() {
             dishWithStages?.let {
                 stageList = it.stages.toMutableList()
                 dish = it.dish
-                followToNewStage()
+                applyUI()
             }
             subscribeToObservers()
             (requireActivity() as MainActivity).supportActionBar?.apply {
@@ -72,7 +72,6 @@ class CookingFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_cooking, container, false)
 
         binding = FragmentCookingBinding.bind(view)
-
         return view
     }
 
@@ -183,12 +182,11 @@ class CookingFragment : Fragment() {
                 )
             }
         }
-        currentStage = stageList[currentPos]
         applyUI()
     }
 
     private fun applyUI() {
-        //currentStage = stageList[currentPos]
+        currentStage = stageList[currentPos]
         binding.apply {
             val assertedTime = CookService.timer.value ?: 1
             if (assertedTime <= 0L && CookService.isWorking && !isNewStage) {

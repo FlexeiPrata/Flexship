@@ -6,6 +6,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.CountDownTimer
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
@@ -21,6 +23,7 @@ import com.flexship.flexshipcookingass.other.Constants.KEY_POSITION_IN_LIST
 import com.flexship.flexshipcookingass.other.Constants.NOTIFICATION_CHANNEL_ID
 import com.flexship.flexshipcookingass.other.Constants.NOTIFICATION_CHANNEL_NAME
 import com.flexship.flexshipcookingass.other.Constants.NOTIFICATION_ID
+import com.flexship.flexshipcookingass.other.LOG_ID
 import com.flexship.flexshipcookingass.other.zeroOrNotZero
 import com.flexship.flexshipcookingass.ui.other.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +38,10 @@ class CookService : LifecycleService() {
     private var isFirstCooking = true
     private var isCanceled = false
 
+    @Volatile
     private var timeToCook = 0L
+
+    private lateinit var timerObject: CountDownTimer
 
     //timer
     private var isTimerEnabled = false
@@ -76,13 +82,6 @@ class CookService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
 
-
-
-        isCooking.observe(this) {
-            if (isWorking) {
-                updateNotification(it)
-            }
-        }
     }
 
     private fun updateNotification(isCooking: Boolean) {
@@ -119,7 +118,7 @@ class CookService : LifecycleService() {
 
     companion object {
         var isCooking = MutableLiveData<Boolean>()
-        val timer = MutableLiveData<Long>()
+        val timer = MutableLiveData<@kotlin.jvm.Volatile Long>()
         var isWorking = false
         var currentDishId = 0
         var posInList = 0
@@ -127,7 +126,7 @@ class CookService : LifecycleService() {
 
     private fun postInitialValues() {
         isCooking.postValue(false)
-        timer.postValue(0L)
+        timer.value = 0
     }
 
     private fun runTimer() {
@@ -136,12 +135,29 @@ class CookService : LifecycleService() {
         CoroutineScope(Dispatchers.Main).launch {
             while (isCooking.value!!) {
                 timeToCook -= Constants.DELAY_FOR_TIMER
-                timer.value = timeToCook
+                Log.d(LOG_ID, (timeToCook/1000).toString())
+                timer.postValue(timeToCook)
                 if (timeToCook <= 0L)
                     pauseService()
                 delay(Constants.DELAY_FOR_TIMER)
             }
         }
+       /* timerObject = object: CountDownTimer(timer.value ?: 0, Constants.DELAY_FOR_TIMER) {
+            override fun onTick(millisUntilFinished: Long) {
+                timer.value = millisUntilFinished
+            }
+
+            override fun onFinish() {
+                pauseService()
+            }
+        }
+        isCooking.observe(this) {
+            if (isWorking) {
+                updateNotification(it)
+                if (!it) timerObject.cancel()
+            }
+        }
+        timerObject.start()*/
     }
 
     private fun startForegroundService() {
